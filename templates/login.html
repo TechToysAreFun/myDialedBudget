@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}
+    Login Page
+{% endblock %}
+
+{% block login %}
+    <div class="row" style="height: 200px;"></div>
+    <div class="row">
+        <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <h2>Login</h2>
+                    <form action="/login" method="POST">
+                        <div class="form-group">
+                            <input type="text" name="username" class="form-control login-form" placeholder="Username" autocomplete="off" autofocus>
+                            <input type="password" name="password" class="form-control login-form" placeholder="Password" autocomplete="off" autofocus>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+            </div>
+        <div class="col-sm-4"></div>
+    </div>
+
+{% endblock %}

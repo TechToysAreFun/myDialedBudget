@@ -1,0 +1,82 @@
+.nav_padd
+{
+    padding-top: 40px;
+}
+
+.log_reg_container
+{
+    padding-top: 75px;
+    padding-bottom: 0px;
+    position: fixed;
+    width: 100%;
+}
+
+.navbar
+{
+    background: rgb(220, 237, 261);
+    border-bottom: outset thin;
+}
+
+.left_nav
+{
+    position: fixed;
+    top: 60px;
+}
+
+.left_nav_row
+{
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+.left_nav_row:hover, .settings_row:hover, .budget_cat
+{
+    border-radius: 7px;
+    border-color: grey;
+    background: rgb(220, 237, 261);
+}
+
+.settings_section
+{
+    background: rgb(220, 237, 261);
+    border-radius: 7px;
+}
+
+.main-group
+{
+    padding-top: 20px;
+    border-left: outset;
+}
+
+.bud-header
+{
+    border-bottom: outset thin;
+    padding-top: 0px;
+    padding-bottom: 20px;
+}
+
+
+.form-control, form-select
+{
+    width: 350px;
+}
+
+.login-form
+{
+    width: 450px;
+}
+
+.sky
+{
+    background-color: rgb(220, 237, 261);
+}
+
+.right_align
+{
+    text-align: right;
+}
+
+.green
+{
+    color: green;
+}

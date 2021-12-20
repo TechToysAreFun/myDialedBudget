@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block title %}
+    Expense Page
+{% endblock %}
+
+{% block main %}
+
+<div class="row">
+    <!-- Crete blank 3-col sections on left and right of content -->
+    <div class="col-sm-3">
+    </div>
+
+    <div class="col-sm-4">
+        <br><br><br><br><br>
+    <h2>Post Transaction</h2>
+    <br>
+        <form action="/expense" method="POST">
+            <div class="form-group">
+                <input type="number" step="0.01" min="0.01" name="amount" class="form-control" placeholder="$0.00" autofocus >
+                <input type="text" list="payees" name="payee" class="form-control" placeholder="Payee" autocomplete='off'>
+                    <datalist id="payees">
+                        <option disabled selected value="">Saved Payees</option>
+                        {% for payee in payees %}
+                            <option value="{{ payee.payee_name }}">{{ payee.payee_name }}</option>
+                        {% endfor %}
+                    </datalist>
+                <select name="cat" class="form-select form-control" placeholder="Category" autocomplete="off" >
+                    <option disabled selected value="">Select a Category</option>
+                    {% for category in cats %}
+                        {% if category.cat_name != 'Deposit' %}
+                            {% if category.cat_name == 'Unassigned' %}
+                                <option value="{{ category.cat_name }}">{{ category.cat_name }} | {{ category.cat_avail | usd }}</option>
+                            {% else %}
+                                <option value="{{ category.cat_name }}">{{ category.cat_name }} | {{ category.cat_avail | usd }}</option>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="date" name="trans_date" class="form-control" >
+                <input type="text" name="memo" maxlength="50" class="form-control" placeholder="Optional memo" autocomplete="off">
+                <button type="submit" class="btn btn-primary">Post Expense</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-3"></div>
+</div>
+
+{% endblock %}

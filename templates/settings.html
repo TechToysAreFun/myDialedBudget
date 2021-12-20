@@ -1,0 +1,328 @@
+{% extends "layout.html" %}
+{% block title %}
+    Settings Page
+{% endblock %}
+
+{% block main %}
+
+
+    <div class="row">
+        <div class="col-sm-10">
+            <h2>Account Settings</h2>
+            <br><br>
+
+            <!-- PERSONAL INFORMATION -->
+            <h4 style="border-bottom: solid 1px" class="settings_row">Personal Information
+                <button id="personal_extend" class="btn" onclick="display_toggle(this.id, 'personal_sett_row', 'personal_minimize')">
+                    <i class="far fa-plus-square"></i>
+                </button>
+                <button id="personal_minimize" class="btn" style="display: none" onclick="display_toggle(this.id, 'personal_sett_row', 'personal_extend')">
+                    <i class="far fa-minus-square"></i>
+                </button>
+            </h4>
+            <div id="personal_sett_row" class="row settings_section" style="display: none;">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-9">
+                    <table class="table">
+                        {% for user in users %}
+                            <tbody>
+                                <tr>
+                                    <th>Name</th>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Username</th>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2">
+                                        <button id="pw_reset_btn" class="btn btn-primary" onclick="display_toggle(this.id, 'pw_reset_form', 'pw_reset_cancel_btn')">Change Password</button>
+                                        <button id="pw_reset_cancel_btn" class="btn btn-danger" style="display: none"  onclick="display_toggle(this.id, 'pw_reset_form', 'pw_reset_btn')">Cancel</button>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        {% endfor %}
+                    </table>
+                    <form id="pw_reset_form" style="display: none" action="/settings/pw_reset" method="post">
+                        <div class="form-group">
+                            <input type="password" name="old" class="form-control" autocomplete="off" required placeholder="Current password">
+                            <input type="password" name="new" class="form-control" autocomplete="off" required placeholder="New password">
+                            <input type="password" name="confirm" class="form-control" autocomplete="off" required placeholder="Confirm password">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <br><br>
+            <h4 style="border-bottom: solid 1px" class="settings_row">Budgets
+                <button id="budgets_expand" class="btn" onclick="display_toggle(this.id, 'bud_sett_row', 'budgets_minimize')">
+                    <i class="far fa-plus-square"></i>
+                </button>
+                <button id="budgets_minimize" class="btn" style="display: none" onclick="display_toggle(this.id, 'bud_sett_row', 'budgets_expand')">
+                    <i class="far fa-minus-square"></i>
+                </button>
+            </h4>
+
+            <div id="bud_sett_row" style="display: none" class="settings_section">
+                <!-- CREATE A NEW BUDGET -->
+                <br>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-9">
+
+                        <h5>Create New Budget</h5>
+                        <form action="/settings/new_bud" method="post">
+                            <div class="form-group">
+                                <input type="text" name="bud_name" class="form-control" placeholder="Budget Name" autocomplete="off" autofocus required>
+                                <input type="number" step="0.01" min="0.01" name="total_assets" class="form-control" placeholder="Current Assets" autocomplete="off" required>
+                                <button type="submit" class="btn btn-primary">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SWITCH BUDGETS -->
+                <br><br>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-9">
+
+                        <h5>Switch Budgets</h5>
+                        <form action="/settings/switch" method="post">
+                            <div class="form-group">
+                                <select name="budget" class="form-select form-control">
+                                    <option class="form-control" disabled selected value="">Select a budget</option>
+                                    {% for budget in budgets %}
+                                        {% if budget.active %}
+                                            <option value="{{ budget.bud_id }}">{{ budget.bud_name }} <em>(Current)</em></option>
+                                        {% else %}
+                                            <option value="{{ budget.bud_id }}">{{ budget.bud_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-primary">Switch</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- RESET BUDGET -->
+                <br><br>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-9">
+
+                        <h5>Reset Budget</h5>
+                        <form action="/settings/bud_reset" method="POST">
+                            <div class="form-group">
+                                <select name="budget" class="form-select form-control" required>
+                                    <option class="form-control" disabled selected value="">Select a budget</option>
+                                    {% for budget in budgets %}
+                                        {% if budget.active %}
+                                            <option value="{{ budget.bud_id }}">{{ budget.bud_name }} <em>(Current)</em></option>
+                                        {% else %}
+                                            <option value="{{ budget.bud_id }}">{{ budget.bud_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="button" id="bud_reset_btn" class="btn btn-warning" onclick="display_toggle(this.id, 'bud_reset_confirm')">Reset</button>
+                                <div id="bud_reset_confirm" style="display: none" class="alert alert-warning">
+                                    <p>This will delete all transactions & allocations but will retain your groups, categories, and payees.</p>
+                                    <button type="button" class="btn btn-primary" onclick="display_toggle('bud_reset_confirm', 'bud_reset_btn')">Cancel</button>
+                                    <button type="submit" class="btn btn-warning">Confirm Reset</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+                <!-- DELETE BUDGET -->
+                <br><br>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-9">
+
+                        <h5>Delete Budget</h5>
+                        <form action="/settings/bud_delete" method="post">
+                            <div class="form-group">
+                                <select name="budget" class="form-select form-control" required>
+                                    <option class="form-control" disabled selected value="">Select a budget</option>
+                                    {% for budget in budgets %}
+                                        {% if budget.active %}
+                                            <option value="{{ budget.bud_id }}">{{ budget.bud_name }} <em>(Current)</em></option>
+                                        {% else %}
+                                            <option value="{{ budget.bud_id }}">{{ budget.bud_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="button" id="delete_bud" onclick="display_toggle(this.id, 'del_bud_conf')" class="btn btn-danger">Delete</button>
+                                <div id="del_bud_conf" style="display: none" class="alert alert-warning">
+                                    <p>Once deleted, your budget will not be recoverable</p>
+                                    <button type="button" class="btn btn-primary" onclick="display_toggle('del_bud_conf', 'delete_bud')">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Confirm Deletion</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADD & EDIT PAYEES -->
+            <br><br>
+            <h4 style="border-bottom: solid 1px" class="settings_row">Payees
+                <button class="btn" id="payee_expand" onclick="display_toggle(this.id, 'payee_sett_row', 'payee_minimize')">
+                    <i class="far fa-plus-square"></i>
+                </button>
+                <button class="btn" id="payee_minimize" style="display: none" onclick="display_toggle(this.id, 'payee_sett_row', 'payee_expand')">
+                    <i class="far fa-minus-square"></i>
+                </button>
+            </h4>
+            <div id="payee_sett_row" style="display: none"class="row settings_section">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-9">
+                    <h5>Edit</h5>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Payee</th>
+                                <th>Transactions</th>
+                                <th>Last Transaction</th>
+                                <th colspan="2">Total Spent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payee in payees %}
+                                <tr>
+
+                                    <td>{{ payee.payee_name }} <button class="btn" onclick="display_toggle('payee_edit_{{ payee.payee_id }}')"><i class='fas fa-edit' style="color:#2196F3"></i></button></td>
+                                    <td>{{ payee.trans_vol }}</td>
+                                    <td>{{ payee.last_trans }}</td>
+                                    <td>{{ payee.spent | usd }}</td>
+                                </tr>
+                                <!-- HIDDEN PAYEE EDIT FORM -->
+                                <tr id="payee_edit_{{ payee.payee_id }}" style="display: none">
+                                    <td colspan="4">
+                                        <p class="alert alert-warning" style="padding: 2px">Payee name changes will affect all historical records</p>
+                                        <form action="/settings/edit_payees" method="POST">
+                                            <div class="form-group">
+                                                <input type="text" name="payee_id" hidden value="{{ payee.payee_id }}">
+                                                <input type="text" name="old_name" hidden value="{{ payee.payee_name }}">
+                                                <input type="text" name="new_name" placeholder="Change name" autocomplete="off">
+                                                <button type="submit" class="btn btn-primary">Change Name</button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            <!-- REACTIVATE GROUPS AND CATEGORIES -->
+            <br><br>
+            <h4 style="border-bottom: solid 1px" class="settings_row">Deactivated Groups & Categories
+                <button id="react_expand" class="btn" onclick="display_toggle(this.id, 'react_sett_row', 'react_minimize')">
+                    <i class="far fa-plus-square"></i>
+                </button>
+                <button id="react_minimize" class="btn" style="display: none" onclick="display_toggle(this.id, 'react_sett_row', 'react_expand')">
+                    <i class="far fa-minus-square"></i>
+                </button>
+            </h4>
+
+            <div id="react_sett_row" style="display:none;" class="settings_section">
+                <!-- GROUPS -->
+                <div class="row ">
+                    <div class="col-sm-1"></div>
+                        <div class="col-sm-9">
+                            <h5>Groups</h5>
+                            <!-- TABLE OF DEACTIVATED GROUPS & CATEGORIES -->
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Group Name</th>
+                                    <th>Reactivate</th>
+                                </thead>
+                                {% for group in groups %}
+                                    <tbody>
+                                        <tr>
+                                            <th>{{ group.group_name }}</th>
+                                            <th>
+                                                <!-- GROUP REACTIVATION FORM -->
+                                                <form action="/settings/group_react" method="post">
+                                                    <div class="form-group">
+                                                        <input type="text" name="group_id" hidden value="{{ group.group_id }}">
+                                                        <button type="submit" class="btn"><i class="far fa-heart" style="color:#2196F3"></i></button>
+                                                    </div>
+                                                </form>
+                                            </th>
+                                        </tr>
+
+                                        {% for cat in catsinc %}
+                                            {% if cat.group_id == group.group_id %}
+                                                <tr>
+                                                    <td>{{ cat.cat_name }}</td>
+                                                    <td>
+                                                        <!-- CAT REACTIVATION FORM -->
+                                                        <form action="/settings/cat_react" method="post">
+                                                            <div class="form-group">
+                                                                <input type="text" name="cat_id" hidden value="{{ cat.cat_id }}">
+                                                                <button type="submit" class="btn"><i class="far fa-heart" style="color:#2196F3"></i></button>
+                                                            </div>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                    </tbody>
+                                {% endfor %}
+                            </table>
+
+                        </div>
+                </div>
+
+                <br>
+                <!-- CATEGORIES -->
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-9">
+                    <h5>Standalone Categories</h5>
+                        <table class="table table-hover">
+                            <thead>
+                                    <th>Category</th>
+                                    <th>Reactivate</th>
+                            </thead>
+                            <tbody>
+                                {% for cat in catsex %}
+                                    <tr>
+                                        <td>{{ cat.cat_name }}</td>
+                                        <td>
+                                            <form action="/settings/cat_react" method="post">
+                                                <div class="form-group">
+                                                    <input type="text" name="cat_id" hidden value="{{ cat.cat_id }}">
+                                                    <button type="submit" class="btn"><i class="far fa-heart" style="color:#2196F3"></i></button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

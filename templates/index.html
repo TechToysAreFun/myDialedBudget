@@ -1,0 +1,291 @@
+{% extends "layout.html" %}
+{% block title %}
+Index Page
+{% endblock %}
+
+{% block main %}
+
+<!-- Remember that everything within the block main is housed within a 10-col grid inside of template.html -->
+
+<!-- If a budget does NOT exist yet, prompt the user to create a new one -->
+{% if not has_budget %}
+<div class="row">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-4">
+        <!-- Send the form to settings route where functions to create a new budget live -->
+        <form action="/settings/new_bud" method="POST">
+            <div class="form-group">
+                <h4>Create a New Budget</h4>
+                <input type="text" name="bud_name" class="form-control" placeholder="Budget Name" autocomplete="off"
+                    autofocus required>
+                <input type="number" step="0.01" min="0.01" name="total_assets" class="form-control"
+                    placeholder="Current Assets" autocomplete="off" required>
+                <button type="submit" class="btn btn-primary">Start Budgeting!</button>
+            </div>
+        </form>
+    </div>
+
+    <dov class="col-sm-3">
+</div>
+</div>
+
+<!-- IF THE USER DOES HAVE ONE OR MORE BUDGETS, DISPLAY THE LAST ONE THEIR ACCOUNT WAS SET TO -->
+{% else %}
+
+<!-- BUDGET HEADER -->
+<div class="row">
+    <div class="col-sm-10 bud-header">
+        <form action="/settings/bud_edit" method="POST">
+            <div class="form-group">
+                <button type="button" id="bud_name_edit" class="btn" style="padding-left: 0px"
+                    onclick="display_toggle(this.id, 'new_bud_name_field', 'new_bud_name_submit', 'new_bud_name_cancel')">
+                    <h2>{{ budget[0].bud_name }}</h2>
+                </button>
+                <h2><input type="text" name="new_name" id="new_bud_name_field" style="display: none"
+                        class="form-control" placeholder="{{ budget[0].bud_name }}" autocomplete="off" required></h2>
+                <button type="submit" id="new_bud_name_submit" style="display: none"
+                    class="btn btn-primary btn-sm">Change Name</button>
+                <button type="button" id="new_bud_name_cancel" style="display: none" class="btn btn-warning btn-sm"
+                    onclick="display_toggle(this.id, 'bud_name_edit', 'new_bud_name_field', 'new_bud_name_submit')">Cancel</button>
+
+            </div>
+        </form>
+
+        <form action="/allocate" method="POST">
+            <div class="form-group">
+                <h5>Unassigned: {{ budget[0].unassigned | usd }}
+                    <button type="button" id="add_unass_funds" class="btn" style="padding-left: 1px;"
+                        onclick="display_toggle(this.id, 'unass_fund', 'submit_unass_fund', 'close_unass_funds')"><i
+                            class='fas fa-plus-circle' style="color: rgb(92, 217, 92)"></i></button>
+                    <button type="button" id="close_unass_funds" class="btn" style="padding-left: 1px; display: none"
+                        onclick="display_toggle(this.id, 'unass_fund', 'submit_unass_fund', 'add_unass_funds')"><i
+                            class="fas fa-minus-circle" style="color: rgb(92, 217, 92)"></i></button>
+                </h5>
+                <input type="number" id="unass_fund" style="display: none" min="0.01" step="0.01" name="amount"
+                    placeholder="$0.00" autocomplete="off" required>
+                <input type="text" name="FROM" value="Deposit" hidden>
+                <input type="text" name="TO" value="Unassigned" hidden>
+                <button type="submit" id="submit_unass_fund" style="display: none" class="btn btn-primary btn-sm">Add
+                    Funds</button>
+                <h5>Total Assets: {{ budget[0].total_assets | usd }}</h5>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MAIN BUDGET TABLE -->
+<div class="row">
+    <div class="col-sm-10">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <!-- ADD GROUPS -->
+                    <th><span>Groups & Categories</span>
+                        <form action="/index/add_group" method="POST" style="display: inline; padding-left: 10px">
+                            <button type="button" id="new_group_btn"
+                                onclick="display_toggle(this.id, 'new_group_name', 'submit_new_group', 'new_group_close')"
+                                class="btn">
+                                <i class='fas fa-plus-circle' style="color:#2196F3"></i>
+                            </button>
+                            <button type="button" id="new_group_close" style="display: none"
+                                onclick="display_toggle(this.id, 'new_group_name', 'submit_new_group', 'new_group_btn')"
+                                class="btn">
+                                <i class='fas fa-minus-circle' style="color:#2196F3"></i>
+                            </button>
+                            <input type="text" name="group_name" id="new_group_name" class="form-control"
+                                style="display: none" placeholder="Group Name" autocomplete="off" required>
+                            <button type="submit" id="submit_new_group" class="btn btn-primary"
+                                style="display: none">Create</button>
+
+                        </form>
+                    </th>
+                    <th class="right_align">Needed By</th>
+                    <th class="right_align">Goal</th>
+                    <th class="right_align">Spent</th>
+                    <th class="right_align">Available</th>
+                </tr>
+            </thead>
+
+            <!-- CREATE SEPARATE <TBODY> TAGS FOR EACH GROUP -->
+            {% for group in groups %}
+            <tbody>
+
+                <!-- GROUP ROW -->
+                <tr class="budget_cat">
+
+                    <!-- ADD CATEGORIES -->
+                    {% if group.active_cats > 0 %}
+                    <th colspan="2">
+                        {% else %}
+                    <th colspan="5">
+                        {% endif %}
+                        {{ group.group_name }}
+                        <button class="btn" id="group_edit_show_{{ group.group_name }}"
+                            onclick="display_toggle(this.id, 'group_edit_hide_{{ group.group_name }}', 'group_edit_{{ group.group_id }}')"><i
+                                class='fas fa-edit' style="color: grey"></i></button>
+                        <button class="btn" id="group_edit_hide_{{ group.group_name }}" style="display: none"
+                            onclick="display_toggle(this.id, 'group_edit_show_{{ group.group_name }}', 'group_edit_{{ group.group_id }}')"><i
+                                class='fas fa-edit' style="color:#2196F3"></i></button>
+                        <form action="/index/add_cat" method="POST" style="display: inline; padding-left: 10px">
+                            <button type="button" id="new_cat_btn_{{ group.group_id }}"
+                                onclick="display_toggle(this.id, 'new_cat_min_{{ group.group_id }}', 'new_cat_name_{{ group.group_id }}', 'submit_new_cat_{{ group.group_id }}', 'new_cat_goal_{{ group.group_id }}', 'new_cat_date_{{ group.group_id }}')"
+                                class="btn" style="padding: 1px; border-radius: 50%"><i class='fas fa-plus-circle'
+                                    style="color:#2196F3"></i></button>
+                            <button type="button" id="new_cat_min_{{ group.group_id }}"
+                                onclick="display_toggle(this.id, 'new_cat_btn_{{ group.group_id }}', 'new_cat_name_{{ group.group_id }}', 'submit_new_cat_{{ group.group_id }}', 'new_cat_goal_{{ group.group_id }}', 'new_cat_date_{{ group.group_id }}')"
+                                class="btn" style="padding: 1px; border-radius: 50%; display: none;"><i
+                                    class='fas fa-minus-circle' style="color:#2196F3"></i></button>
+                            <input type="text" name="cat_name" id="new_cat_name_{{ group.group_id }}"
+                                class="form-control" style="display: none" placeholder="Category Name"
+                                autocomplete="off" required>
+                            <input type="number" step="0.01" min="0.01" name="goal"
+                                id="new_cat_goal_{{ group.group_id }}" class="form-control" style="display: none"
+                                placeholder="Goal Amount" autocomplete="off">
+                            <input type="number" name="due" id="new_cat_date_{{ group.group_id }}"
+                                placeholder="Needed By Day" min="1" max="28" class="form-control" style="display:none">
+                            <input type="hidden" name="group_id" value="{{ group.group_id }}">
+                            <button type="submit" id="submit_new_cat_{{ group.group_id }}" class="btn btn-primary"
+                                style="display: none;">Create</button>
+                        </form>
+                    </th>
+
+                    <!-- CHECK FOR GROUPS WITH AT LEAST 1 ACTIVE CAT. OTHERWISE INDEXING INTO THE LIST WILL SEGMENT FAULT -->
+                    {% if group.active_cats > 0 %}
+
+                    {% set id = group.group_id %}
+
+                    {% for row in totals %}
+
+                    {% if row.group_id == id %}
+
+                    <!-- GOAL TOTAL ROW -->
+                    <td class="right_align">{{ row.goal | usd }}</td>
+
+                    <!-- SPENT TOTAL ROW -->
+                    <td class="right_align">{{ row.spent | usd }}</td>
+
+                    <!-- AVAIL TOTAL ROW -->
+                    <td class="right_align">{{ row.avail | usd }}</td>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% endif %}
+
+                </tr>
+
+                <!-- HIDDEN EDIT ROW FOR EACH GROUP -->
+                <tr id="group_edit_{{ group.group_id }}" style="display: none">
+                    <td colspan="5">
+                        <form method="post">
+                            <div class="form-group">
+                                <input type="text" name="group_id" hidden value="{{ group.group_id }}">
+                                <input type="text" name="new_name" class="form-control" placeholder="Change name"
+                                    autocomplete="off">
+                                <button type="submit" class="btn btn-primary"
+                                    formaction="/index/group_edit">Update</button>
+                                <button type="submit" class="btn btn-danger"
+                                    formaction="/index/group_del">Deactivate</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+
+                <!-- CREATE NEW ROW FOR EACH CATEGORY IN GROUP -->
+                {% for category in cats %}
+
+                {% if category.group_id == group.group_id %}
+                <tr>
+                    <td>
+                        <!-- CATEGORY NAME - HOUSED WITHIN A FORM THAT'S SEEN ONLY AS THE TWO BUTTONS AFTER THE NAME -->
+                        <form action="/allocate" method="POST">
+
+                            <div class="form-group">
+                                {{ category.cat_name }}
+                                <input type="text" name="TO" value="{{ category.cat_name }}" hidden>
+                                <input type="text" name="FROM" value="Unassigned" hidden>
+                                <input type="text" name="amount" value="-1" hidden>
+                                <button type="button" class="btn" id="cat_edit_show_{{ category.cat_id }}"
+                                    onclick="display_toggle(this.id, 'cat_edit_hide_{{ category.cat_id }}', 'cat_edit_{{ category.cat_id }}')"><i
+                                        class='fas fa-edit' style="color: lightgrey"></i></button>
+                                <button type="button" class="btn" id="cat_edit_hide_{{ category.cat_id }}"
+                                    style="display: none"
+                                    onclick="display_toggle(this.id, 'cat_edit_show_{{ category.cat_id }}', 'cat_edit_{{ category.cat_id }}')"><i
+                                        class='fas fa-edit' style="color: #2196F3"></i></button>
+                                <button type="submit" id="fully_fund_{{ category.cat_id }}" class="btn"><i
+                                        class='fas fa-dollar-sign' style="color: rgb(92, 217, 92)"></i></button>
+                            </div>
+                        </form>
+                    </td>
+                    <td class="right_align">
+                        {% if category.due_tup_d %}
+                        <!-- HANDLE LETTERING FOR NUMBERS (st, nd, rd, th) i,e,. 1st, 2nd, 3rd, etc. -->
+                        {% if ((category.due_tup_d == '1') or (category.due_tup_d == '21')) %}
+                        {{ category.due_tup_d }}st
+
+                        {% elif ((category.due_tup_d == '2') or (category.due_tup_d == '22')) %}
+                        {{ category.due_tup_d }}nd
+
+                        {% elif ((category.due_tup_d == '3') or (category.due_tup_d == '23')) %}
+                        {{ category.due_tup_d }}rd
+
+                        {% elif not category.due_tup_d %}
+                        {{ category.due_tup_d }}
+
+                        {% else %}
+                        {{ category.due_tup_d }}th
+
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td class="right_align">{{ category.cat_goal | usd }}</td>
+                    <td class="right_align">{{ category.cat_spent | usd }}</td>
+                    <td id="bg-avail-{{ category.cat_id }}" class="right_align">
+                        {{ category.cat_avail | usd }}
+                        <i id="check_field_{{ category.cat_id }}" style="display: none" class='far fa-check-circle'></i>
+                    </td>
+                </tr>
+
+                <!-- HIDDEN EDIT ROW FOR EACH CATEGORY -->
+                <tr id="cat_edit_{{ category.cat_id }}" style="display: none">
+                    <td colspan="5">
+                        <form method="post">
+                            <div class="form-group">
+                                <input type="text" name="cat_id" hidden value="{{ category.cat_id }}">
+                                <input type="number" name="new_goal" min="0.01" step="0.01" class="form-control"
+                                    placeholder="Goal" autocomplete="off">
+                                <input type="number" name="new_due" min="1" max="28" class="form-control"
+                                    placeholder="Needed By Day" autocomplete="off">
+                                <input type="text" name="new_name" class="form-control" placeholder="Name"
+                                    autocomplete="off">
+                                <div class="form-control">
+                                    <input id="remove_due" type="checkbox" name="rm_due">
+                                    <label for="remove_due" style="color: grey"> Remove Needed By Day </label>
+                                </div>
+                                <div class="form-control">
+                                    <input id="remove_goal" type="checkbox" name="rm_goal">
+                                    <label for="rm_goal" style="color: grey"> Remove Goal</label><br>
+                                </div>
+                                <button type="submit" class="btn btn-primary"
+                                    formaction="/index/cat_edit">Update</button>
+                                <button type="submit" id="cat_del_conf_{{ category.cat_id }}" class="btn btn-danger"
+                                    formaction="/index/cat_del">Deactivate</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+
+                {% endif %}
+
+                <!-- RUN JAVASCRIPT TO SET 'AVAIL' BACKGROUND COLOR -->
+                <script>avail_bg('{{ category.cat_goal }}', '{{ category.cat_goal_met }}', '{{ category.cat_goal_spent }}', '{{ category.cat_avail }}', "bg-avail-{{ category.cat_id }}", "check_field_{{ category.cat_id }}", "fully_fund_{{ category.cat_id }}");</script>
+                {% endfor %}
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block title %}
+    Transactions Page
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+
+            <div class="col-sm-7">
+
+                <h2>Transaction History</h2>
+                <br>
+
+                <!-- Expenses Table -->
+                <h4>Expenses & Deposits</h4>
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="sky">
+                            <th>Date <em>(Y/M/D)</em></th>
+                            <th>Category</th>
+                            <th>Payee</th>
+                            <th>Amount</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in trans %}
+                            <tr>
+                                <td>{{ transaction.trans_date }}</td>
+                                {% if transaction.active %}
+                                    <td>{{ transaction.cat_name }}</td>
+                                {% else %}
+                                    <td>{{ transaction.cat_name }} <em style="color: red">(Inactive)</em></td>
+                                {% endif %}
+                                <td>{{ transaction.payee }}</td>
+                                <td>{{ transaction.amount | usd }}</td>
+                                <td><em>{{ transaction.memo }}</em></td>
+                            </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <br><br>
+                <!-- Allocations & Moves Table -->
+                <h4>Allocations & Moves</h4>
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="sky">
+                            <th>Date</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Amount</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alloc in allocs %}
+                            <tr>
+                                <td>{{ alloc.alloc_date }}</td>
+                                {% for cat in cats %}
+                                    {% if cat.cat_id == alloc.from_cat_id %}
+                                        {% if cat.active %}
+                                            <td>{{ alloc.from_cat_name }}</td>
+                                        {% else %}
+                                            <td>{{ alloc.from_cat_name }} <em style="color: red">(Inactive)</em></td>
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% for cat in cats %}
+                                    {% if cat.cat_id == alloc.to_cat_id %}
+                                        {% if cat.active %}
+                                            <td>{{ alloc.to_cat_name }}</td>
+                                        {% else %}
+                                             <td>{{ alloc.to_cat_name }} <em style="color: red">(Inactive)</em></td>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                <td>{{ alloc.amount | usd }}</td>
+                                <td>{{ alloc.memo }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        <div class="col-sm-3"></div>
+    </div>
+
+{% endblock %}

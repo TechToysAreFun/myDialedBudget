@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}
+    Allocate Page
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-sm-3"></div>
+            <div class="col-sm-4">
+                <br><br><br><br><br>
+                <h2>Allocate Funds</h2>
+                <br>
+                <!-- Allocate form -->
+                <form action="/allocate" method="post">
+                    <div class='form-group'>
+                        <input type="number" name="amount" step="0.01" min="0.01" class="form-control" placeholder="$0.00" autocomplete="off" autofocus>
+                        <select name="FROM" class="form-select form-control" autocomplete="off">
+                            <option disabled selected value="">From</option>
+                            {% for category in cats %}
+                                <!-- CHECK FOR 'DEPOSIT' CATEGORY -->
+                                {% if category.cat_name == 'Deposit' %}
+                                    <option value="{{ category.cat_name }}">{{ category.cat_name }} <em>(External)</em></option>
+                                <!-- CHECK FOR 'UNASSIGNED' CATEGORY -->
+                                {% elif category.cat_name == 'Unassigned' %}
+                                    <option value="{{ category.cat_name }}">{{ category.cat_name }} | {{ category.cat_avail | usd }}</option>
+                                <!-- NORMAL BUDGET CATEGORIES -->
+                                {% else %}
+                                <!-- CHECK IF CATEGORY IS ACTIVE -->
+                                    {% if category.active %}
+                                            <option value="{{ category.cat_name }}">{{ category.cat_name }} ({{ category.cat_avail | usd }} of {{ category.cat_goal | usd }})</option>
+                                    {% else %}
+                                        <option value="{{ category.cat_name }}">{{ category.cat_name }} <em>(Inactive)</em> ({{ category.cat_avail | usd }} of {{ category.cat_goal | usd }})</option>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <select name="TO" class="form-select form-control" autocomplete="off">
+                            <option disabled selected value="">To</option>
+                            {% for category in cats %}
+                                {% if category.cat_name != 'Deposit' %}
+                                    {% if category.cat_name == 'Unassigned' %}
+                                        <option value="{{ category.cat_name }}">{{ category.cat_name }} | {{ category.cat_avail | usd }}</option>
+                                    {% else %}
+                                        <option value="{{ category.cat_name }}">{{ category.cat_name }} ({{ category.cat_avail | usd }} of {{ category.cat_goal | usd }})</option>
+                                    {% endif %}
+
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <input type="text" mame="memo" class="form-control" placeholder="Optional memo" autocomplete="off">
+                        <button type="submit" class="btn btn-primary">Allocate!</button>
+                    </div>
+                </form>
+            </div>
+        <div class="col-sm-3"></div>
+    </div>
+
+{% endblock %}
