@@ -1041,3 +1041,7 @@ def logout():
 
     # Send user back to index, which requires login, which will redirect back to login.html
     return redirect('/')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
