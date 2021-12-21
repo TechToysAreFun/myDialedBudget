@@ -50,7 +50,7 @@ def index():
     # Determine if the user has any budgets
     has_budget = True
     if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
-        return render_template('index.html', has_budget=False)
+        return render_template('index.html', has_budget=False, ptitle='Budget')
 
 
     # Find out what budget the user's account was last set to
@@ -108,7 +108,7 @@ def index():
 
 
     # Send the user's groups, cats, and calculated totals to index.html
-    return render_template('index.html', has_budget=has_budget, budget=BUDGET, groups=GROUPS, cats=CATS, totals=TOTALS)
+    return render_template('index.html', has_budget=has_budget, budget=BUDGET, groups=GROUPS, cats=CATS, totals=TOTALS, ptitle='Budget')
 
 
 
@@ -359,11 +359,11 @@ def login():
         # Validate that a username and a password were entered
         if not username:
             flash('Username field empty', 'danger')
-            return render_template('login.html', logged=logged)
+            return render_template('login.html', logged=logged, ptitle='Login')
 
         if not password:
             flash('Password field empty', 'danger')
-            return render_template('login.html', logged=logged)
+            return render_template('login.html', logged=logged, ptitle='Login')
 
         # Query username and password from Users table
         USER = db.execute("SELECT * FROM users WHERE username = ?", username)
@@ -382,12 +382,12 @@ def login():
 
         if not exists:
             flash('Incorrect username', 'danger')
-            return render_template('login.html', logged=logged)
+            return render_template('login.html', logged=logged, ptitle='Login')
 
         # Check that password is correct
         if not check_password_hash(USER[0]['password'], password):
                 flash('Invalid passworrd', 'danger')
-                return render_template('login.html', logged=logged)
+                return render_template('login.html', logged=logged, ptitle='Login')
 
         """ All credentials match. Log user in. """
 
@@ -410,7 +410,7 @@ def login():
         return redirect('/')
 
     else:
-        return render_template('login.html', session=session)
+        return render_template('login.html', session=session, ptitle='Login')
 
 
 """ ---------- G O A L   C H E C K ------------------------------------------------------------------------------------------ """
@@ -499,30 +499,30 @@ def register():
         # Validate that all fields received values
         if not first_name or not last_name or not email or not username or not password:
             flash('Please complete all fields', 'warning')
-            return render_template('register.html', logged=logged)
+            return render_template('register.html', logged=logged, ptitle='Register')
 
         # Make sure username is unique
         for user in db.execute("SELECT * FROM users"):
             if username == user['username']:
                 flash('Username already taken', 'warning')
-                return render_template('register.html', logged=logged)
+                return render_template('register.html', logged=logged, ptitle='Register')
 
         # Validate that passwords match
         if password != confirmation:
             flash('Passwords do not match', 'warning')
-            return render_template('register.html', logged=logged)
+            return render_template('register.html', logged=logged, ptitle='Register')
 
         # Use REGEX to validate email
         regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z|A-Z]{2,}\b'
         if not re.fullmatch(regex, email):
             flash('Invalid email', 'warning')
-            return render_template('register.html', logged=logged)
+            return render_template('register.html', logged=logged, ptitle='Register')
 
         # Make sure email hasn't already been used
         for user in db.execute("SELECT * FROM users"):
             if email == user['email']:
                 flash('An account is already registered under that email', 'warning')
-                return render_template('register.html', logged=logged)
+                return render_template('register.html', logged=logged, ptitle='Register')
 
 
         # Hash password
@@ -536,10 +536,10 @@ def register():
 
         # Redirect to index
         flash('Registration successful!', 'success')
-        return render_template('login.html', logged=logged)
+        return render_template('login.html', logged=logged, ptitle='Login')
 
     if request.method == "GET":
-        return render_template('register.html')
+        return render_template('register.html', ptitle='Register')
 
 
 """ ---------- E X P E N S E ------------------------------------------------------------------------------------------ """
@@ -632,7 +632,7 @@ def expense():
         # Extract user's existing categories to pass into html
         CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
 
-        return render_template('expense.html', payees=PAYEES, cats=CATS)
+        return render_template('expense.html', payees=PAYEES, cats=CATS, ptitle='Post Transaction')
 
 
 """ ---------- A L L O C A T E ------------------------------------------------------------------------------------------ """
@@ -769,7 +769,7 @@ def allocate():
         # Extract user's cats and feed to html form
         CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
 
-        return render_template('allocate.html', cats=CATS)
+        return render_template('allocate.html', cats=CATS, ptitle='Allocate Funds')
 
 
 
@@ -787,7 +787,7 @@ def transactions():
     # Get user's cats to reference active status in allocs
     CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ?", session['user_id'], session['selected_bud'])
 
-    return render_template('transactions.html', trans=TRANS, allocs=ALLOCS, cats=CATS)
+    return render_template('transactions.html', trans=TRANS, allocs=ALLOCS, cats=CATS, ptitle='Transaction History')
 
 
 """ ---------- S E T T I N G S  /  U S A G E ------------------------------------------------------------------------------------------ """
@@ -1029,7 +1029,7 @@ def settings_usage():
     # Get all information from users table
     USERS = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])
 
-    return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS)
+    return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings')
 
 
 """ ---------- L O G O U T ------------------------------------------------------------------------------------------ """
