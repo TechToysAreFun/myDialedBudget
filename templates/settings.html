@@ -87,7 +87,7 @@
                 <div class="col-sm-9">
 
                     <h5>Create New Budget</h5>
-                    <form action="/settings/new_bud" method="post">
+                    <form action="{{ url_for('settings', usage='new_bud') }}" method="post">
                         <div class="form-group">
                             <input type="text" name="bud_name" class="form-control" placeholder="Budget Name"
                                 autocomplete="off" autofocus required>
@@ -106,7 +106,7 @@
                 <div class="col-sm-9">
 
                     <h5>Switch Budgets</h5>
-                    <form action="/settings/switch" method="post">
+                    <form action="{{ url_for('settings', usage='switch')}}" method="post">
                         <div class="form-group">
                             <select name="budget" class="form-select form-control">
                                 <option class="form-control" disabled selected value="">Select a budget</option>
@@ -131,7 +131,7 @@
                 <div class="col-sm-9">
 
                     <h5>Reset Budget</h5>
-                    <form action="/settings/bud_reset" method="POST">
+                    <form action="{{ url_for('settings', usage='bud_reset')}}" method="POST">
                         <div class="form-group">
                             <select name="budget" class="form-select form-control" required>
                                 <option class="form-control" disabled selected value="">Select a budget</option>
@@ -165,7 +165,7 @@
                 <div class="col-sm-9">
 
                     <h5>Delete Budget</h5>
-                    <form action="/settings/bud_delete" method="post">
+                    <form action="{{ url_for('settings', usage='bud_delete')}}" method="post">
                         <div class="form-group">
                             <select name="budget" class="form-select form-control" required>
                                 <option class="form-control" disabled selected value="">Select a budget</option>
@@ -232,7 +232,7 @@
                             <td colspan="4">
                                 <p class="alert alert-warning" style="padding: 2px">Payee name changes will affect all
                                     historical records</p>
-                                <form action="/settings/edit_payees" method="POST">
+                                <form action="{{ url_for('settings', usage='edit_payees')}}" method="POST">
                                     <div class="form-group">
                                         <input type="text" name="payee_id" hidden value="{{ payee.payee_id }}">
                                         <input type="text" name="old_name" hidden value="{{ payee.payee_name }}">
@@ -279,7 +279,7 @@
                                 <th>{{ group.group_name }}</th>
                                 <th>
                                     <!-- GROUP REACTIVATION FORM -->
-                                    <form action="/settings/group_react" method="post">
+                                    <form action="{{ url_for('settings', usage='group_react')}}" method="post">
                                         <div class="form-group">
                                             <input type="text" name="group_id" hidden value="{{ group.group_id }}">
                                             <button type="submit" class="btn"><i class="far fa-heart"
@@ -295,7 +295,7 @@
                                 <td>{{ cat.cat_name }}</td>
                                 <td>
                                     <!-- CAT REACTIVATION FORM -->
-                                    <form action="/settings/cat_react" method="post">
+                                    <form action="{{ url_for('settings', usage='cat_react')}}" method="post">
                                         <div class="form-group">
                                             <input type="text" name="cat_id" hidden value="{{ cat.cat_id }}">
                                             <button type="submit" class="btn"><i class="far fa-heart"
@@ -330,7 +330,7 @@
                             <tr>
                                 <td>{{ cat.cat_name }}</td>
                                 <td>
-                                    <form action="/settings/cat_react" method="post">
+                                    <form action="{{ url_for('settings', usage='cat_react')}}" method="post">
                                         <div class="form-group">
                                             <input type="text" name="cat_id" hidden value="{{ cat.cat_id }}">
                                             <button type="submit" class="btn"><i class="far fa-heart"

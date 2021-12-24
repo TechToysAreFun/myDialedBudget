@@ -15,10 +15,10 @@
     <script src="https://kit.fontawesome.com/cedb82d192.js" crossorigin="anonymous"></script>
 
     <!-- Link to personal CSS file -->
-    <link href="/static/final.css" rel="stylesheet">
+    <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='final.css') }}">
 
     <!--Link to personal JS file-->
-    <script src="/static/finalJS.js"></script>
+    <script src="{{ url_for('static', filename='finalJS.js') }}"></script>
 
     <title>{% block title %}{% endblock title %}</title>
 </head>
@@ -44,7 +44,7 @@
     <nav class="navbar navbar-inverse fixed-top">
         <div class="container-fluid">
             <div class="navbar_header" style="font-size: x-large;">
-                <a class="navbar-brand" href="/"><i class="	fas fa-home"></i></a>
+                <a class="navbar-brand" href=" {{ url_for('index') }}"><i class="fas fa-home"></i></a>
                 <span style="color: purple;"> B</span>
                 <span style="color: blue">u</span>
                 <span style="color: green">d</span>
@@ -96,28 +96,28 @@
             <div class="col-sm-2 left_nav">
 
                 <!-- Budget row -->
-                <a href="/">
+                <a href="{{ url_for('index') }}">
                     <div class="row left_nav_row">
                         <h3>Budget</h3>
                     </div>
                 </a>
 
                 <!-- Transactions row -->
-                <a href="/transactions">
+                <a href="{{ url_for('transactions') }}">
                     <div class="row left_nav_row">
                         <h3>History</h3>
                     </div>
                 </a>
 
                 <!-- Allocate row -->
-                <a href="/allocate">
+                <a href="{{ url_for('allocate') }}">
                     <div class="row left_nav_row">
                         <h3>Allocate</h3>
                     </div>
                 </a>
 
                 <!-- Post row -->
-                <a href="/expense">
+                <a href="{{ url_for('expense') }}">
                     <div class="row left_nav_row">
                         <h3>Post</h3>
                     </div>

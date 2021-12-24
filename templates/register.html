@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-sm-4"></div>
     <div class="col-sm-4">
-        <form action="/register" method="POST">
+        <form action="{{ url_for('register')}}" method="POST">
             <h2>Register</h2>
             <div class="form-group">
                 <input type="text" name="first_name" class="form-control login-form" placeholder="First"

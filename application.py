@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
@@ -39,7 +39,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///final.db")
 
-""" The above code sourced from Harvard's CS50x Finance source code. Everything past this line is my own code """
+""" The above code sourced from Harvard's CS50x Finance source code. Everything past this line is original """
 
 
 """ ---------- I N D E X ------------------------------------------------------------------------------------------ """
@@ -132,7 +132,7 @@ def index_usage(usage):
         for group in GROUPS:
             if group_name == group['group_name']:
                 flash('That group name already exists in this budget.')
-                return render_temnplate('/')
+                return render_template('/')
 
         # Update user's group count in this budget
         db.execute("UPDATE budgets SET groups = (groups + ?) WHERE user_id = ? AND bud_id = ?", 1, session['user_id'], session['selected_bud'])
@@ -141,7 +141,7 @@ def index_usage(usage):
         db.execute("INSERT INTO groups (bud_id, user_id, group_name) VALUES (?, ?, ?)", selected_bud, session['user_id'], group_name)
 
         flash('Group created!', 'success')
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
 
@@ -161,7 +161,7 @@ def index_usage(usage):
         # Reject category name if it's "deposit" or "unassigned"
         if cat_name == 'Deposit' or cat_name == 'Unassigned':
             flash('Your budget automatically comes with that category.')
-            return redirect('/')
+            return redirect(url_for('index'))
 
 
         # Reject category name if it already exists in the same budget
@@ -172,7 +172,7 @@ def index_usage(usage):
                     flash('You already have that category name set to inactive. Reactivate in Settings page.', 'warning')
                 else:
                     flash('That category name already exists in this budget.')
-                return redirect('/')
+                return redirect(url_for('index'))
 
 
         # Update user's cat count in this group
@@ -190,7 +190,7 @@ def index_usage(usage):
         db.execute("INSERT INTO cats (group_id, bud_id, user_id, cat_name, cat_funded, cat_goal_met, cat_spent, cat_avail, due_tup_m, due_tup_d, cat_goal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", group_id, session['selected_bud'], session['user_id'], cat_name, 0, 0, 0, 0, due_month, due_day, cat_goal)
 
         flash('Category created!', 'success')
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
 
@@ -222,7 +222,7 @@ def index_usage(usage):
             for name in existing:
                 if new_name == name['cat_name']:
                     flash('That category already exists in your budget')
-                    return redirect('/')
+                    return redirect(url_for('index'))
 
             # Update cat_name
             db.execute("UPDATE cats SET cat_name = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", new_name, session['user_id'], session['selected_bud'], cat_id)
@@ -270,9 +270,9 @@ def index_usage(usage):
         flash('Category updated', 'success')
 
         if check_goal == False:
-            return redirect('/')
+            return redirect(url_for('index'))
         else:
-            return redirect('/goal_check')
+            return redirect(url_for('goal_check'))
 
 
     """ Deactivate Category """
@@ -290,7 +290,7 @@ def index_usage(usage):
         db.execute("UPDATE groups SET active_cats = (active_cats - ?) WHERE user_id = ? AND bud_id = ? AND group_id = ?", 1, session['user_id'], session['selected_bud'], group_id)
 
         flash('Category deactivated', 'success')
-        return redirect('/')
+        return redirect(url_for('goal_check'))
 
 
     """ Edit Group """
@@ -304,14 +304,14 @@ def index_usage(usage):
         for name in existing:
             if new_name == name['group_name']:
                 flash('That group already exists in your budget', 'warning')
-                return redirect('/')
+                return redirect(url_for('index'))
 
 
         # Rename the group
         db.execute("UPDATE groups SET group_name = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", new_name, session['user_id'], session['selected_bud'], group_id)
 
         flash('Group name updated', 'success')
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
 
@@ -334,10 +334,10 @@ def index_usage(usage):
         db.execute("UPDATE groups SET active = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", 0, session['user_id'], session['selected_bud'], group_id)
 
         flash('Group deactivated', 'success')
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
 """ ---------- L O G I N ------------------------------------------------------------------------------------------ """
@@ -407,7 +407,7 @@ def login():
             name = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['first_name']
             flash(f'Hello, {name}!', 'primary')
 
-        return redirect('/')
+        return redirect(url_for('index'))
 
     else:
         return render_template('login.html', session=session, ptitle='Login')
@@ -475,7 +475,7 @@ def goal_check():
             # Do NOT reset
             db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 0, session['user_id'], session['selected_bud'], cat['cat_id'])
 
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
 
@@ -559,7 +559,7 @@ def expense():
         # Validate that all required fields were populated
         if not amount or not payee or not cat or not date:
             flash('Please complete all required fields', 'warning')
-            return redirect('/expense')
+            return redirect(url_for('expense'))
 
         # Convert cat_name into cat_id
         cat_id = db.execute("SELECT * FROM cats WHERE cat_name = ? AND user_id = ?", cat, session['user_id'])[0]['cat_id']
@@ -571,7 +571,7 @@ def expense():
             required = amount - cat_avail
             # The following.   "{:.2f}".format()     formats a python float with 2 decilal points
             flash(f'Insufficient funds: ${"{:.2f}".format(required)} more needed in {cat}', 'danger')
-            return redirect('/expense')
+            return redirect(url_for('expense'))
 
         # First check if the cat goal has been fully funded
         goal_spent = CATS[0]['cat_goal_spent']
@@ -621,7 +621,7 @@ def expense():
         db.execute("UPDATE groups SET group_spent = (group_spent + ?), group_avail = (group_avail - ?) WHERE group_id = ? AND user_id = ?", amount, amount, group_id, session['user_id'])
 
 
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
     if request.method == "GET":
@@ -666,7 +666,7 @@ def allocate():
                 if float(db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND cat_id = ?", session['user_id'], session['selected_bud'], TO_ID)[0]['cat_goal']) == 0.00:
                     # A Goal isn't set
                     flash("This category doesn't have a goal yet", "warning")
-                    return redirect('/')
+                    return redirect(url_for('index'))
 
                 else:
                     # The goal is fully funded
@@ -675,7 +675,7 @@ def allocate():
                     fully_funded_check = True
 
                     flash("This category is already funded!", "success")
-                    return redirect('/')
+                    return redirect(url_for('index'))
 
 
         # Else, the request is coming from the Allocate page
@@ -693,12 +693,12 @@ def allocate():
         # Validate that all required fields were populated
         if not amount or not TO or not FROM:
             flash('Please complete all required fields', 'warning')
-            return redirect('/allocate')
+            return redirect(url_for('allocate'))
 
         # Validate that "amount" is a positive number
         if amount <= 0:
             flash('Only positive values may be allocated.', 'warning')
-            return redirect('/allocate')
+            return redirect(url_for('allocate'))
 
         # Check for sufficient funds when FROM is not 'Deposit'
         if FROM != 'Deposit':
@@ -706,7 +706,7 @@ def allocate():
             if amount > cat_avail:
                 required = amount - cat_avail
                 flash(f'Insufficient funds: ${"{:.2f}".format(required)} more needed in {FROM}', 'danger')
-                return redirect('/allocate')
+                return redirect(url_for('allocate'))
 
 
         # Update user's total_assets if from Deposit
@@ -762,7 +762,7 @@ def allocate():
         else:
             flash(f'Allocated ${"{:.2f}".format(amount)} to {TO}', 'success')
 
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
     if request.method == "GET":
@@ -818,7 +818,7 @@ def settings(usage):
         db.execute("UPDATE users SET budgets = (budgets + ?) WHERE user_id = ?", 1, session['user_id'])
 
         flash(f"{bud_name} successfully created", "success")
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
     if usage == "switch":
@@ -839,7 +839,7 @@ def settings(usage):
         db.execute("UPDATE users SET selected_bud = ? WHERE user_id = ?", session['selected_bud'], session['user_id'])
 
         flash(f"Switched to {bud_name}", "success")
-        return redirect('/goal_check')
+        return redirect(url_for('goal_check'))
 
     if usage =="edit_payees":
         # Get form inputs
@@ -851,7 +851,7 @@ def settings(usage):
         for payee in db.execute("SELECT * FROM payees WHERE user_id = ? and bud_id = ?", session["user_id"], session["selected_bud"]):
             if new_name == payee['payee_name']:
                 flash("That payee name already exists.", "warning")
-                return redirect('/settings')
+                return redirect(url_for('settings'))
 
         # Update payee name in payees table
         db.execute("UPDATE payees SET payee_name = ? WHERE user_id = ? AND bud_id = ? AND payee_id = ?", new_name, session["user_id"], session["selected_bud"], payee_id)
@@ -860,7 +860,7 @@ def settings(usage):
         db.execute("UPDATE trans SET payee = ? WHERE user_id = ? AND bud_id = ? AND payee = ?", new_name, session["user_id"], session["selected_bud"], old_name)
 
         flash('Payee name updated', 'success')
-        return redirect('/settings')
+        return redirect(url_for('settings'))
 
 
     if usage == "group_react":
@@ -874,7 +874,7 @@ def settings(usage):
         db.execute("UPDATE cats SET active = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", 1, session["user_id"], session["selected_bud"], group_id )
 
         flash("Group and categories reactivated!", "success")
-        return redirect('/settings')
+        return redirect(url_for('settings'))
 
     if usage == "cat_react":
         # Get cat_id
@@ -884,7 +884,7 @@ def settings(usage):
         db.execute("UPDATE cats SET active = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 1, session["user_id"], session["selected_bud"], cat_id)
 
         flash("Category reactivated!", "success")
-        return redirect('/settings')
+        return redirect(url_for('settings'))
 
     if usage == "pw_reset":
         # Get user input for existing pw, new pw, and confirmation
@@ -898,7 +898,7 @@ def settings(usage):
         # Check that old password matches the existing password
         if not check_password_hash(USER[0]['password'], old):
             flash('Incorrect password', 'danger')
-            return redirect('/settings')
+            return redirect(url_for('settings'))
 
         # Check that new and confirm match
         if new == confirm:
@@ -912,7 +912,7 @@ def settings(usage):
         else:
             flash('New passwords do not match', 'danger')
 
-        return redirect('/settings')
+        return redirect(url_for('settings'))
 
 
 
@@ -950,7 +950,7 @@ def settings(usage):
 
             flash(f'Budget successfully deleted. Switched to: {new_bud[0]["bud_name"]}', 'success')
 
-            return redirect('/settings')
+            return redirect(url_for('settings'))
 
         # Else if no other budgets, return to index
         else:
@@ -961,7 +961,7 @@ def settings(usage):
             db.execute("UPDATE users SET selected_bud = ? WHERE user_id = ?", '', session['user_id'])
 
             flash('Budget successfully deleted', 'success')
-            return redirect('/')
+            return redirect(url_for('index'))
 
 
 
@@ -992,7 +992,7 @@ def settings(usage):
         bud_name = db.execute("SELECT * FROM budgets WHERE user_id = ? AND bud_id = ?", session['user_id'], bud_id)[0]['bud_name']
 
         flash(f'{bud_name} successfully reset!', 'success')
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
 
@@ -1003,7 +1003,7 @@ def settings(usage):
         db.execute("UPDATE budgets SET bud_name = ? WHERE user_id = ? AND bud_id = ?", new_bud_name, session['user_id'], session['selected_bud'])
 
         flash('Budget name updated', 'success')
-        return redirect('/')
+        return redirect(url_for('index'))
 
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
@@ -1040,7 +1040,7 @@ def logout():
     session.clear()
 
     # Send user back to index, which requires login, which will redirect back to login.html
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@
     <div class="col-sm-3"></div>
     <div class="col-sm-4">
         <!-- Send the form to settings route where functions to create a new budget live -->
-        <form action="/settings/new_bud" method="POST">
+        <form action="{{ url_for('settings', usage='new_bud')}}" method="POST">
             <div class="form-group">
                 <h4>Create a New Budget</h4>
                 <input type="text" name="bud_name" class="form-control" placeholder="Budget Name" autocomplete="off"
@@ -35,7 +35,7 @@
 <!-- BUDGET HEADER -->
 <div class="row">
     <div class="col-sm-10 bud-header">
-        <form action="/settings/bud_edit" method="POST">
+        <form action="{{ url_for('settings', usage='bud_edit')}}" method="POST">
             <div class="form-group">
                 <button type="button" id="bud_name_edit" class="btn" style="padding-left: 0px"
                     onclick="display_toggle(this.id, 'new_bud_name_field', 'new_bud_name_submit', 'new_bud_name_cancel')">
@@ -51,7 +51,7 @@
             </div>
         </form>
 
-        <form action="/allocate" method="POST">
+        <form action="{{ url_for('allocate')}}" method="POST">
             <div class="form-group">
                 <h5>Unassigned: {{ budget[0].unassigned | usd }}
                     <button type="button" id="add_unass_funds" class="btn" style="padding-left: 1px;"
@@ -81,7 +81,8 @@
                 <tr>
                     <!-- ADD GROUPS -->
                     <th><span>Groups & Categories</span>
-                        <form action="/index/add_group" method="POST" style="display: inline; padding-left: 10px">
+                        <form action="{{ url_for('index', usage='add_group')}}" method="POST"
+                            style="display: inline; padding-left: 10px">
                             <button type="button" id="new_group_btn"
                                 onclick="display_toggle(this.id, 'new_group_name', 'submit_new_group', 'new_group_close')"
                                 class="btn">
@@ -126,7 +127,8 @@
                         <button class="btn" id="group_edit_hide_{{ group.group_name }}" style="display: none"
                             onclick="display_toggle(this.id, 'group_edit_show_{{ group.group_name }}', 'group_edit_{{ group.group_id }}')"><i
                                 class='fas fa-edit' style="color:#2196F3"></i></button>
-                        <form action="/index/add_cat" method="POST" style="display: inline; padding-left: 10px">
+                        <form action="{{ url_for('index', usage='add_cat')}}" method="POST"
+                            style="display: inline; padding-left: 10px">
                             <button type="button" id="new_cat_btn_{{ group.group_id }}"
                                 onclick="display_toggle(this.id, 'new_cat_min_{{ group.group_id }}', 'new_cat_name_{{ group.group_id }}', 'submit_new_cat_{{ group.group_id }}', 'new_cat_goal_{{ group.group_id }}', 'new_cat_date_{{ group.group_id }}')"
                                 class="btn" style="padding: 1px; border-radius: 50%"><i class='fas fa-plus-circle'
@@ -199,7 +201,7 @@
                 <tr>
                     <td>
                         <!-- CATEGORY NAME - HOUSED WITHIN A FORM THAT'S SEEN ONLY AS THE TWO BUTTONS AFTER THE NAME -->
-                        <form action="/allocate" method="POST">
+                        <form action="{{ url_for('allocate')}}" method="POST">
 
                             <div class="form-group">
                                 {{ category.cat_name }}
