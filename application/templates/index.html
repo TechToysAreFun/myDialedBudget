@@ -13,7 +13,7 @@
     <div class="col-sm-3"></div>
     <div class="col-sm-4">
         <!-- Send the form to settings route where functions to create a new budget live -->
-        <form action="{{ url_for('settings', usage='new_bud')}}" method="POST">
+        <form action="{{ url_for('settings_usage', usage='new_bud')}}" method="POST">
             <div class="form-group">
                 <h4>Create a New Budget</h4>
                 <input type="text" name="bud_name" class="form-control" placeholder="Budget Name" autocomplete="off"
@@ -35,7 +35,7 @@
 <!-- BUDGET HEADER -->
 <div class="row">
     <div class="col-sm-10 bud-header">
-        <form action="{{ url_for('settings', usage='bud_edit')}}" method="POST">
+        <form action="{{ url_for('settings_usage', usage='bud_edit')}}" method="POST">
             <div class="form-group">
                 <button type="button" id="bud_name_edit" class="btn" style="padding-left: 0px"
                     onclick="display_toggle(this.id, 'new_bud_name_field', 'new_bud_name_submit', 'new_bud_name_cancel')">
@@ -81,7 +81,7 @@
                 <tr>
                     <!-- ADD GROUPS -->
                     <th><span>Groups & Categories</span>
-                        <form action="{{ url_for('index', usage='add_group')}}" method="POST"
+                        <form action="{{ url_for('index_usage', usage='add_group')}}" method="POST"
                             style="display: inline; padding-left: 10px">
                             <button type="button" id="new_group_btn"
                                 onclick="display_toggle(this.id, 'new_group_name', 'submit_new_group', 'new_group_close')"
@@ -127,7 +127,7 @@
                         <button class="btn" id="group_edit_hide_{{ group.group_name }}" style="display: none"
                             onclick="display_toggle(this.id, 'group_edit_show_{{ group.group_name }}', 'group_edit_{{ group.group_id }}')"><i
                                 class='fas fa-edit' style="color:#2196F3"></i></button>
-                        <form action="{{ url_for('index', usage='add_cat')}}" method="POST"
+                        <form action="{{ url_for('index_usage', usage='add_cat')}}" method="POST"
                             style="display: inline; padding-left: 10px">
                             <button type="button" id="new_cat_btn_{{ group.group_id }}"
                                 onclick="display_toggle(this.id, 'new_cat_min_{{ group.group_id }}', 'new_cat_name_{{ group.group_id }}', 'submit_new_cat_{{ group.group_id }}', 'new_cat_goal_{{ group.group_id }}', 'new_cat_date_{{ group.group_id }}')"
@@ -200,9 +200,10 @@
                 {% if category.group_id == group.group_id %}
                 <tr>
                     <td>
-                        <!-- CATEGORY NAME - HOUSED WITHIN A FORM THAT'S SEEN ONLY AS THE TWO BUTTONS AFTER THE NAME -->
+                        <!-- CATEGORY LINE -->
                         <form action="{{ url_for('allocate')}}" method="POST">
 
+                            <!-- FULLY FUND CATEGORY -->
                             <div class="form-group">
                                 {{ category.cat_name }}
                                 <input type="text" name="TO" value="{{ category.cat_name }}" hidden>
@@ -249,7 +250,8 @@
                     </td>
                 </tr>
 
-                <!-- HIDDEN EDIT ROW FOR EACH CATEGORY -->
+                <!-- CATEGORY EDIT FORM THAT EXTENDS OPEN THE CATEGORY ROW WHEN CLICKED -->
+                <!-- Note that this form has two different actions based on the Submit and Deactivate buttons at the bottom -->
                 <tr id="cat_edit_{{ category.cat_id }}" style="display: none">
                     <td colspan="5">
                         <form method="post">

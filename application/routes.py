@@ -1,46 +1,11 @@
-import os
 
-from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session, url_for
-from flask_session import Session
-from tempfile import mkdtemp
-from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
+from flask import flash, redirect, render_template, request, session, url_for
+from application import app
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
 import re
-
-from helpers import login_required, usd
-
-# Configure application
-app = Flask(__name__)
-
-# Maue sure the server auto-updates templates when any changes are made
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-
-# Make sure responses from requests aren't cached
-@app.after_request
-def after_request(response):
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Expires"] = 0
-    response.headers["Pragma"] = "no-cache"
-    return response
-
-
-# Custom filter
-app.jinja_env.filters["usd"] = usd
-
-# Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_FILE_DIR"] = mkdtemp()
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
-# Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///final.db")
-
-""" The above code sourced from Harvard's CS50x Finance source code. Everything past this line is original """
-
+from application.helpers import login_required
+from application import db
 
 """ ---------- I N D E X ------------------------------------------------------------------------------------------ """
 @app.route('/')
@@ -793,9 +758,15 @@ def transactions():
 """ ---------- S E T T I N G S  /  U S A G E ------------------------------------------------------------------------------------------ """
 @app.route('/settings/<usage>', methods=["POST"])
 @login_required
-def settings(usage):
+def settings_usage(usage):
 
     if usage == "new_bud":
+
+        # See if user currently has a budget. If so, switch it's active status to 0 (false)
+        if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] > 0:
+            db.execute("UPDATE budgets SET active = ? WHERE user_id = ? AND bud_id = ?", 0, session['user_id'], session['selected_bud'])
+
+        # New budgets are created with a default active status of 0 (true)
 
         # Get budget name and assets
         bud_name = request.form.get("bud_name")
@@ -824,16 +795,16 @@ def settings(usage):
     if usage == "switch":
         # Get new bud_id and bud_name
         new_bud_id = request.form.get("budget")
-        bud_name = db.execute("SELECT * FROM budgets WHERE user_id = ? AND bud_id = ?", session["user_id"], session["selected_bud"])[0]["bud_name"]
+        bud_name = db.execute("SELECT * FROM budgets WHERE user_id = ? AND bud_id = ?", session["user_id"], new_bud_id)[0]["bud_name"]
 
-        # Switch old budgets active' culumn in budgets to false
-        db.execute("UPDATE budgets SET active = ? WHERE bud_id = ?", 1, session['selected_bud'])
+        # Switch old budgets active column in budgets to false
+        db.execute("UPDATE budgets SET active = ? WHERE bud_id = ?", 0, session['selected_bud'])
 
         # Update user's cookies
         session['selected_bud'] = new_bud_id
 
         # Switch new budgets 'active' culumn in budgets to true
-        db.execute("UPDATE budgets SET active = ? WHERE bud_id = ?", 0, session['selected_bud'])
+        db.execute("UPDATE budgets SET active = ? WHERE bud_id = ?", 1, session['selected_bud'])
 
         # Update user's selected_bud in users table
         db.execute("UPDATE users SET selected_bud = ? WHERE user_id = ?", session['selected_bud'], session['user_id'])
@@ -935,7 +906,6 @@ def settings(usage):
         # Delete all groups in the budget
         db.execute("DELETE FROM groups WHERE user_id = ? AND bud_id = ?", session['user_id'], bud_id)
 
-
         # Delete all payees in the budget
         db.execute("DELETE FROM payees WHERE user_id = ? AND bud_id = ?", session['user_id'], bud_id)
 
@@ -946,7 +916,14 @@ def settings(usage):
         if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] > 0:
             new_bud = db.execute("SELECT * FROM budgets WHERE user_id = ?", session['user_id'])
 
+            # Update session
             session['selected_bud'] = new_bud[0]['bud_id']
+
+            # Update user's selected budget
+            db.execute("UPDATE users SET selected_bud = ? WHERE user_id = ?", session['selected_bud'], session['user_id'])
+
+            # Set the budget to active
+            db.execute("UPDATE budgets SET active = ? WHERE user_id = AND bud_id = ?", 1, session['user_id'], session['selected_bud'])
 
             flash(f'Budget successfully deleted. Switched to: {new_bud[0]["bud_name"]}', 'success')
 
@@ -1009,7 +986,7 @@ def settings(usage):
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
 @app.route('/settings')
 @login_required
-def settings_usage():
+def settings():
 
     # Get user's budgets
     BUDGETS = db.execute("SELECT * FROM budgets WHERE user_id = ?", session['user_id'])
@@ -1041,7 +1018,3 @@ def logout():
 
     # Send user back to index, which requires login, which will redirect back to login.html
     return redirect(url_for('index'))
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
