@@ -8,15 +8,23 @@
 
 <div class="row">
     <div class="col-sm-10">
+        <br>
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-2">
+                <img class="rounded-circle account-img pointer border border-dark"
+                    onclick="display_toggle('edit_avatar')" src="{{ avatar }}">
+            </div>
+            <div class="col-sm-8">
+                <br><br>
+                <h2>Account Settings</h2>
+            </div>
+        </div>
+        <div id='edit_avatar' style="display: none" class="row">
+            <div class="col-sm-10">
+                <br>
                 <form id="avatar_Edit" action="{{ url_for('settings_usage', usage='edit_avatar')}}" method="POST"
                     enctype=multipart/form-data>
-                    <button type="button" id="avatar_edit_show" class="btn btn-default"
-                        onclick=" display_toggle('edit_avatar')">
-                        <img class="rounded-circle account-img" src="{{ avatar }}">
-                    </button>
-                    <fieldset id='edit_avatar' style="display: none">
+                    <fieldset>
                         <input type="file" id="avatar_file" class="form-control form-control-sm" name="avatar_file"
                             onchange='return avatarValidation()'>
                         <button type="submit" class="btn btn-primary btn-sm">Upload</button>
@@ -24,10 +32,6 @@
                             onclick="display_toggle('edit_avatar')">Cancel</button>
                     </fieldset>
                 </form>
-            </div>
-            <div class="col-sm-7">
-                <br><br>
-                <h2>Account Settings</h2>
             </div>
         </div>
         <br>

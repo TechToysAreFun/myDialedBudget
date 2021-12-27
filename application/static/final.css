@@ -90,3 +90,7 @@
     font-size: 12px;
     line-height: 1.42857;
 }
+
+.pointer:hover {
+    cursor: pointer;
+}
