@@ -9,7 +9,7 @@ function display_toggle(t1, t2, t3, t4, t5, t6) {
         v4 = document.getElementById(t4),
         v5 = document.getElementById(t5),
         v6 = document.getElementById(t6)
-        ];
+    ];
 
     for (let i = 0; i < toggles.length; i++) {
         if (toggles[i].style.display === '') {
@@ -34,13 +34,13 @@ function avail_bg(goal, goal_met, goal_spent, avail, field_id, check_icon, fund_
             if (goal_spent == 1) {
                 if (avail == 0) {
                     // Grey
-                    avail_color.style.backgroundColor =  'lightgrey';
+                    avail_color.style.backgroundColor = 'lightgrey';
                     check.style.display = '';
                     fund.style.display = 'none';
                 }
                 else {
                     // Goal fully spent, but additional funds added, so turn back to Green
-                    avail_color.style.backgroundColor =  'rgb(92, 217, 92)';
+                    avail_color.style.backgroundColor = 'rgb(92, 217, 92)';
                     check.style.display = '';
                     fund.style.display = 'none';
                 }
@@ -63,5 +63,24 @@ function avail_bg(goal, goal_met, goal_spent, avail, field_id, check_icon, fund_
     else {
         // In this case, there is no goal set for the category, so do not show the fund button
         fund.style.display = 'none';
+    }
+}
+
+function avatarValidation() {
+
+    // Get user's uploaded image
+    avatar = document.getElementById('avatar_file');
+
+    // Get the string value of the file name
+    filePath = avatar.value;
+
+    // Set regex
+    allowed = /(\.jpg|\.png|\.jpeg)$/i;
+
+    // Match file extension to regex
+    if (!allowed.exec(filePath)) {
+        alert('Invalid file type. Please choose from: .jpg .png .jpeg');
+        avatar.value = '';
+        return false;
     }
 }

@@ -1,4 +1,6 @@
-
+import os
+import secrets
+from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for
 from application import app
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -354,14 +356,16 @@ def login():
                 flash('Invalid passworrd', 'danger')
                 return render_template('login.html', logged=logged, ptitle='Login')
 
-        """ All credentials match. Log user in. """
-
+        """ All credentials match. Proceed to log user in. """
+        
+        # Indicate the layout format for flashed messages to use
         logged = 1
 
         # Set session cookies
         session['user_id'] = USER[0]['user_id']
         session['selected_bud'] = USER[0]['selected_bud']
         session['day_tup'] = (datetime.datetime.now().strftime("%m"), datetime.datetime.now().strftime("%d"))
+        session['avatar'] = USER[0]['avatar']
 
 
         # Redirect user to homepage (index)
@@ -982,6 +986,39 @@ def settings_usage(usage):
         flash('Budget name updated', 'success')
         return redirect(url_for('index'))
 
+    
+    # Update profile picture
+    if usage == "edit_avatar":
+        # Receive user's uploaded file from form
+        avatar = request.form.get("avatar_file")
+
+        # Extract file extension
+        _, f_ext = os.path.splitext(avatar)
+
+        #Create random hex code for new filename
+        random_hex = secrets.token_hex(8)
+        
+        # Concat hex code to file extension
+        new_name = random_hex + f_ext
+
+        # Concat the root path and file location to the new file
+        file_path = os.path.join(app.root_path, 'static/avatars', new_name)
+
+        # Set desired resizing
+        output_size = (125, 125)
+        
+        # Open original image and resize it
+        i = Image.open(avatar)
+        i.thumbnail(output_size)
+
+        # Save resized image with newly rendered filepath
+        i.save(file_path)
+
+        # Redirect to settings
+        flash('Avatar successfully updated', 'success')
+        return redirect(url_for('settings'))
+
+
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
 @app.route('/settings')
@@ -1006,7 +1043,7 @@ def settings():
     # Get all information from users table
     USERS = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])
 
-    return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings')
+    return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings', avatar=session['avatar'])
 
 
 """ ---------- L O G O U T ------------------------------------------------------------------------------------------ """
