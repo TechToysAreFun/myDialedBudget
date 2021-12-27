@@ -4,6 +4,7 @@ from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for
 from application import app
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 import datetime
 import re
 from application.helpers import login_required
@@ -759,6 +760,7 @@ def transactions():
     return render_template('transactions.html', trans=TRANS, allocs=ALLOCS, cats=CATS, ptitle='Transaction History')
 
 
+
 """ ---------- S E T T I N G S  /  U S A G E ------------------------------------------------------------------------------------------ """
 @app.route('/settings/<usage>', methods=["POST"])
 @login_required
@@ -989,11 +991,22 @@ def settings_usage(usage):
     
     # Update profile picture
     if usage == "edit_avatar":
-        # Receive user's uploaded file from form
-        avatar = request.form.get("avatar_file")
+        
+        # Check that a file extension exists
+        if 'avatar_file' not in request.files:
+            flash('No file part', 'warning')
+            return redirect(url_for('settings'))
+
+        # Receive user's uploaded file from the form
+        avatar = request.files['avatar_file']
+
+        # Check that a file was selected before submission (The browser submits an empty filename if not)
+        if avatar.filename == '':
+            flash('No file selected')
+            return redirect(request.url)
 
         # Extract file extension
-        _, f_ext = os.path.splitext(avatar)
+        _, f_ext = os.path.splitext(avatar.filename)
 
         #Create random hex code for new filename
         random_hex = secrets.token_hex(8)
@@ -1014,6 +1027,12 @@ def settings_usage(usage):
         # Save resized image with newly rendered filepath
         i.save(file_path)
 
+        # Update user's avatar to the new image path
+        db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
+
+        # Update session for avatar
+        session['avatar'] = os.path.join('static/avatars', new_name)
+        
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
         return redirect(url_for('settings'))

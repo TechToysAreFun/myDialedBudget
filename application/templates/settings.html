@@ -8,21 +8,29 @@
 
 <div class="row">
     <div class="col-sm-10">
-        <h2>Account Settings</h2>
-        <form id="avatar_Edit" action="{{ url_for('settings_usage', usage='edit_avatar')}}" method="post">
-            <button type="button" id=" avatar_edit_show" class="btn btn-default btn-circle"
-                onclick=" display_toggle('edit_avatar')">
-                <img class="rounded-circle account-img" src="{{ avatar }}">
-            </button>
-            <fieldset id='edit_avatar' style="display: none">
-                <input type="file" id="avatar_file" class="form-control form-control-sm" name="avatar_file"
-                    onchange='return avatarValidation()'>
-                <button type="submit" class="btn btn-primary btn-sm">Upload</button>
-                <button type="button" class="btn btn-danger btn-sm"
-                    onclick="display_toggle('edit_avatar')">Cancel</button>
-            </fieldset>
-        </form>
-        <br><br>
+        <div class="row">
+            <div class="col-sm-3">
+                <form id="avatar_Edit" action="{{ url_for('settings_usage', usage='edit_avatar')}}" method="POST"
+                    enctype=multipart/form-data>
+                    <button type="button" id="avatar_edit_show" class="btn btn-default"
+                        onclick=" display_toggle('edit_avatar')">
+                        <img class="rounded-circle account-img" src="{{ avatar }}">
+                    </button>
+                    <fieldset id='edit_avatar' style="display: none">
+                        <input type="file" id="avatar_file" class="form-control form-control-sm" name="avatar_file"
+                            onchange='return avatarValidation()'>
+                        <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+                        <button type="button" class="btn btn-danger btn-sm"
+                            onclick="display_toggle('edit_avatar')">Cancel</button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="col-sm-7">
+                <br><br>
+                <h2>Account Settings</h2>
+            </div>
+        </div>
+        <br>
 
         <!-- PERSONAL INFORMATION -->
         <h4 style="border-bottom: solid 1px" class="settings_row">Personal Information

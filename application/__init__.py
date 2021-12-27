@@ -19,7 +19,7 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-# Custom filter
+# Create custom filter
 app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
@@ -30,6 +30,7 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///application/final.db")
+
 
 # routes must be imported after the database is initialized above because routes uses the db.
 from application import routes
