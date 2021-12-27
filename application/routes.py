@@ -2,13 +2,14 @@ import os
 import secrets
 from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for
-from application import app
+from application import app, nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 import datetime
 import re
 from application.helpers import login_required
 from application import db
+
 
 """ ---------- I N D E X ------------------------------------------------------------------------------------------ """
 @app.route('/')
@@ -367,7 +368,6 @@ def login():
         session['selected_bud'] = USER[0]['selected_bud']
         session['day_tup'] = (datetime.datetime.now().strftime("%m"), datetime.datetime.now().strftime("%d"))
         session['avatar'] = USER[0]['avatar']
-
 
         # Redirect user to homepage (index)
         if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['is_first_login'] == 1:
@@ -1017,8 +1017,9 @@ def settings_usage(usage):
         # Concat the root path and file location to the new file
         file_path = os.path.join(app.root_path, 'static/avatars', new_name)
 
-        # Set desired resizing
+        # Set resizing for settings page display and navbar display
         output_size = (125, 125)
+        nav_size = (40, 40)
         
         # Open original image and resize it
         i = Image.open(avatar)
@@ -1027,11 +1028,20 @@ def settings_usage(usage):
         # Save resized image with newly rendered filepath
         i.save(file_path)
 
-        # Update user's avatar to the new image path
-        db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
+        # Resize and save for navbar
+        i.thumbnail(nav_size)
+        i.save(os.path.join(app.root_path, 'static/avatars/nav', new_name))
 
-        # Update session for avatar
+        # Update user's avatar to the new image paths
+        db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
+        db.execute("UPDATE users SET nav_avatar = ? WHERE user_id = ?", os.path.join('static/avatars/nav', new_name), session['user_id'])
+
+        # Update session for settings page image
         session['avatar'] = os.path.join('static/avatars', new_name)
+
+        # Set global variable for navbar image since this needs to be passed to layout.html, which is never called via render_template
+        global nav_avatar
+        nav_avatar = os.path.join('static/avatars/nav', new_name)
         
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
@@ -1044,25 +1054,31 @@ def settings_usage(usage):
 @login_required
 def settings():
 
-    # Get user's budgets
-    BUDGETS = db.execute("SELECT * FROM budgets WHERE user_id = ?", session['user_id'])
-
-    # Get user's payees and order alphabetically
-    PAYEES = db.execute("SELECT * FROM payees WHERE user_id = ? AND bud_id = ? ORDER BY payee_name ASC", session['user_id'], session['selected_bud'])
-
-    # Get user's deactivated groups
-    GROUPS = db.execute("SELECT * FROM groups WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 0)
-
-    # Get user's deactivated categories that are in deactivated groups
-    CATSinc = db.execute("SELECT * FROM cats JOIN groups ON cats.group_id = groups.group_id WHERE cats.user_id = ? AND cats.bud_id = ? AND cats.active = ? AND groups.active = ?", session['user_id'], session['selected_bud'], 0, 0)
-
-    # Get user's deactivated cats that are not in deactivated groups
-    CATSex = db.execute("SELECT * FROM cats JOIN groups ON cats.group_id = groups.group_id WHERE cats.user_id = ? AND cats.bud_id = ? AND cats.active = ? AND groups.active = ?", session['user_id'], session['selected_bud'], 0, 1)
-
     # Get all information from users table
     USERS = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])
+    
+    # Determine if the user has any budgets
+    if USERS[0]['budgets'] >= 1:
 
-    return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings', avatar=session['avatar'])
+        # Get user's budgets
+        BUDGETS = db.execute("SELECT * FROM budgets WHERE user_id = ?", session['user_id'])
+
+        # Get user's payees and order alphabetically
+        PAYEES = db.execute("SELECT * FROM payees WHERE user_id = ? AND bud_id = ? ORDER BY payee_name ASC", session['user_id'], session['selected_bud'])
+
+        # Get user's deactivated groups
+        GROUPS = db.execute("SELECT * FROM groups WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 0)
+
+        # Get user's deactivated categories that are in deactivated groups
+        CATSinc = db.execute("SELECT * FROM cats JOIN groups ON cats.group_id = groups.group_id WHERE cats.user_id = ? AND cats.bud_id = ? AND cats.active = ? AND groups.active = ?", session['user_id'], session['selected_bud'], 0, 0)
+
+        # Get user's deactivated cats that are not in deactivated groups
+        CATSex = db.execute("SELECT * FROM cats JOIN groups ON cats.group_id = groups.group_id WHERE cats.user_id = ? AND cats.bud_id = ? AND cats.active = ? AND groups.active = ?", session['user_id'], session['selected_bud'], 0, 1)
+    
+
+        return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings', avatar=session['avatar'])
+
+    return render_template('settings.html', users=USERS, ptitle='Account Settings', avatar=session['avatar'])
 
 
 """ ---------- L O G O U T ------------------------------------------------------------------------------------------ """
@@ -1074,3 +1090,11 @@ def logout():
 
     # Send user back to index, which requires login, which will redirect back to login.html
     return redirect(url_for('index'))
+
+
+""" ---------- N A V   B A R   A V A T A R  ----------"""
+
+@app.context_processor
+def context_processor():
+    global nav_avatar
+    return dict(avatar_key=nav_avatar )
