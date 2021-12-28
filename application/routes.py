@@ -368,6 +368,10 @@ def login():
         session['selected_bud'] = USER[0]['selected_bud']
         session['day_tup'] = (datetime.datetime.now().strftime("%m"), datetime.datetime.now().strftime("%d"))
         session['avatar'] = USER[0]['avatar']
+        session['nav_avatar'] = USER[0]['nav_avatar']
+
+        global nav_avatar
+        nav_avatar = session['nav_avatar']
 
         # Redirect user to homepage (index)
         if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['is_first_login'] == 1:
@@ -596,6 +600,11 @@ def expense():
 
     if request.method == "GET":
 
+         # If user doesn't have a budget yet, alert them and return to index
+        if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
+            flash("You don't have a budget yet. Create one below!", "warning")
+            return redirect(url_for('index'))
+
         # Pass user's payees to the select input
         PAYEES = db.execute("SELECT * FROM payees WHERE user_id = ? AND bud_id = ?", session['user_id'], session['selected_bud'])
 
@@ -736,6 +745,11 @@ def allocate():
 
 
     if request.method == "GET":
+        # If user doesn't have a budget yet, alert them and return to index
+        if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
+            flash("You don't have a budget yet. Create one below!", "warning")
+            return redirect(url_for('index'))
+
         # Extract user's cats and feed to html form
         CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
 
@@ -747,6 +761,11 @@ def allocate():
 @app.route ('/transactions')
 @login_required
 def transactions():
+
+     # If user doesn't have a budget yet, alert them and return to index
+    if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
+        flash("You don't have a budget yet. Create one below!", "warning")
+        return redirect(url_for('index'))
 
     # Get user's transaction history and join to cats to know whether the cat is active and indicate that in the tables
     TRANS = db.execute("SELECT * FROM trans JOIN cats ON trans.cat_id = cats.cat_id WHERE trans.user_id = ? AND trans.bud_id = ? ORDER BY trans_date DESC", session['user_id'], session['selected_bud'])
@@ -1036,12 +1055,11 @@ def settings_usage(usage):
         db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
         db.execute("UPDATE users SET nav_avatar = ? WHERE user_id = ?", os.path.join('static/avatars/nav', new_name), session['user_id'])
 
-        # Update session for settings page image
+        # Update session for settings page and navbar image
         session['avatar'] = os.path.join('static/avatars', new_name)
-
-        # Set global variable for navbar image since this needs to be passed to layout.html, which is never called via render_template
+        session['nav_avatar'] = os.path.join('static/avatars/nav', new_name)
         global nav_avatar
-        nav_avatar = os.path.join('static/avatars/nav', new_name)
+        nav_avatar = session['nav_avatar']
         
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
@@ -1096,5 +1114,4 @@ def logout():
 
 @app.context_processor
 def context_processor():
-    global nav_avatar
-    return dict(avatar_key=nav_avatar )
+    return dict(avatar_key=nav_avatar)

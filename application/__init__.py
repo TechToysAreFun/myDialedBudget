@@ -31,8 +31,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///application/final.db")
 
-# Set global variable for navbar avatar that needs to be passed to layout.html
-nav_avatar = 'static/avatars/nav/default.png'
+nav_avatar = '/static/avatars/nav/default.png'
 
 
 # routes must be imported after the database is initialized above because routes uses the db.
