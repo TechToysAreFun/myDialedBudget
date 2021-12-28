@@ -11,6 +11,8 @@ app = Flask(__name__)
 # Maue sure the server auto-updates templates when any changes are made
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+app.config["SECRET_KEY"] = 'TEST'
+
 # Make sure responses from requests aren't cached
 @app.after_request
 def after_request(response):
@@ -31,7 +33,9 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///application/final.db")
 
+# Set global variable that will hold the user's navbar avatar
 nav_avatar = '/static/avatars/nav/default.png'
+
 
 
 # routes must be imported after the database is initialized above because routes uses the db.

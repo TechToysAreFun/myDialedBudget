@@ -9,6 +9,7 @@ import datetime
 import re
 from application.helpers import login_required
 from application import db
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
 """ ---------- I N D E X ------------------------------------------------------------------------------------------ """
@@ -1065,6 +1066,20 @@ def settings_usage(usage):
         flash('Avatar successfully updated', 'success')
         return redirect(url_for('settings'))
 
+    
+    if usage == 'reset_token':
+        # Get user ID and pass to get_reset_token()
+        user_id = session['user_id']
+
+        token = get_reset_token(user_id, 1800)
+
+        user = verify_reset_token(token)
+
+        return render_template('test.html', test=user)
+
+            
+
+
 
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
@@ -1109,9 +1124,21 @@ def logout():
     # Send user back to index, which requires login, which will redirect back to login.html
     return redirect(url_for('index'))
 
-
-""" ---------- N A V   B A R   A V A T A R  ----------"""
+""" -------------------------------------------------------------------------------- """
 
 @app.context_processor
 def context_processor():
     return dict(avatar_key=nav_avatar)
+
+
+def get_reset_token(user_id, expires_sec=1800):
+            s = Serializer(app.config['SECRET_KEY'], expires_sec)
+            return s.dumps({'user_id': user_id}).decode('utf-8')
+
+def verify_reset_token(token):
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+        user_id = s.loads(token)['user_id']
+    except:
+        return None
+    return db.execute("SELECT user_id, first_name, last_name FROM users WHERE user_id = ?", user_id)
