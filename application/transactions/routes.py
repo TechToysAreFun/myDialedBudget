@@ -1,6 +1,5 @@
 
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
-from application import app
 from application.helpers import login_required
 from application import db
 
@@ -9,7 +8,7 @@ transactions = Blueprint('transactions', __name__)
 
 
 """ ---------- E X P E N S E ------------------------------------------------------------------------------------------ """
-@app.route('/expense', methods=["GET", "POST"])
+@transactions.route('/expense', methods=["GET", "POST"])
 @login_required
 def expense():
 

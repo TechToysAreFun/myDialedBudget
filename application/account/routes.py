@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
-from application import app, nav_avatar
+from application import nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
 import re
@@ -11,7 +11,7 @@ account = Blueprint('account', __name__)
 
 
 """ ---------- R E G I S T E R ------------------------------------------------------------------------------------------ """
-@app.route('/register', methods=["GET", "POST"])
+@account.route('/register', methods=["GET", "POST"])
 def register():
 
     if request.method == "POST":
@@ -75,7 +75,7 @@ def register():
 
 """ ---------- L O G I N ------------------------------------------------------------------------------------------ """
 
-@app.route('/login', methods=['GET', 'POST'])
+@account.route('/login', methods=['GET', 'POST'])
 def login():
 
     # Clear the existing user_id
@@ -153,7 +153,7 @@ def login():
 
 
 """ ---------- L O G O U T ------------------------------------------------------------------------------------------ """
-@app.route('/logout')
+@account.route('/logout')
 def logout():
 
     # Forget the user_id currently logged into the filesystem
@@ -165,7 +165,7 @@ def logout():
 
 
 """ ---------- E M A I L  R E S E T ------------------------------------------------------------------------------------------ """
-@app.route('/reset_pw', methods=['GET', 'POST'])
+@account.route('/reset_pw', methods=['GET', 'POST'])
 def reset_request():
 
         # Get all data from users table for both route methods
@@ -204,7 +204,7 @@ def reset_request():
                 return render_template('login.html', logged=0)
         
 
-@app.route('/reset_pw/<token>', methods=['GET'])
+@account.route('/reset_pw/<token>', methods=['GET'])
 def reset_token(token):
 
     # User is accessing the page via the link in their email, which also passes the <token> parameter
@@ -219,7 +219,7 @@ def reset_token(token):
         return render_template('reset_pw.html', token=token)
 
 
-@app.route('/submit_reset', methods=['POST'])
+@account.route('/submit_reset', methods=['POST'])
 def submit_reset():
 
     token = request.form.get('token')

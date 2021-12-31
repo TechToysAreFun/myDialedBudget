@@ -5,7 +5,7 @@ from application import db
 history = Blueprint('history', __name__)
 
 """ ---------- T R A N S A C T I O N S   H I S T O R Y ------------------------------------------------------------------------------------------ """
-@app.route ('/transactions')
+@history.route ('/transactions')
 @login_required
 def transactions():
 

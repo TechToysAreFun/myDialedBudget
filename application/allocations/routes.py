@@ -8,7 +8,7 @@ allocations = Blueprint('allocations', __name__)
 
 
 """ ---------- A L L O C A T E ------------------------------------------------------------------------------------------ """
-@app.route('/allocate', methods=["GET", "POST"])
+@allocations.route('/allocate', methods=["GET", "POST"])
 @login_required
 def allocate():
 

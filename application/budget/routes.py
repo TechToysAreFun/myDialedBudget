@@ -5,7 +5,7 @@ from application import db
 budget = Blueprint('budget', __name__)
 
 """ ---------- I N D E X ------------------------------------------------------------------------------------------ """
-@app.route('/')
+@budget.route('/')
 @login_required
 def index():
 
@@ -76,7 +76,7 @@ def index():
 
 
 """ ---------- I N D E X  /  U S A G E ------------------------------------------------------------------------------------------ """
-@app.route('/index/<usage>', methods=["POST"])
+@budget.route('/index/<usage>', methods=["POST"])
 @login_required
 def index_usage(usage):
 
@@ -304,7 +304,7 @@ def index_usage(usage):
 
 
 """ ---------- G O A L   C H E C K ------------------------------------------------------------------------------------------ """
-@app.route('/goal_check')
+@budget.route('/goal_check')
 @login_required
 def goal_check():
 

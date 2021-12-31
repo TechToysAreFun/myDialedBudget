@@ -1,19 +1,18 @@
 import os
 import secrets
 from PIL import Image
-from flask import flash, redirect, render_template, request, session, url_for, Blueprint
-from application import app, nav_avatar
+from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
+from application import  nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.helpers import login_required
 from application import db
-from settings.utils import context_processor
 
 settings = Blueprint('settings', __name__)
 
 
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
-@app.route('/settings')
+@settings.route('/settings')
 @login_required
 def settings():
 
@@ -45,7 +44,7 @@ def settings():
 
 
 """ ---------- S E T T I N G S  /  U S A G E ------------------------------------------------------------------------------------------ """
-@app.route('/settings/<usage>', methods=["POST"])
+@settings.route('/settings/<usage>', methods=["POST"])
 @login_required
 def settings_usage(usage):
 
@@ -298,7 +297,7 @@ def settings_usage(usage):
         new_name = random_hex + f_ext
 
         # Concat the root path and file location to the new file
-        file_path = os.path.join(app.root_path, 'static/avatars', new_name)
+        file_path = os.path.join(current_app.root_path, 'static/avatars', new_name)
 
         # Set resizing for settings page display and navbar display
         output_size = (125, 125)
@@ -313,7 +312,7 @@ def settings_usage(usage):
 
         # Resize and save for navbar
         i.thumbnail(nav_size)
-        i.save(os.path.join(app.root_path, 'static/avatars/nav', new_name))
+        i.save(os.path.join(current_app.root_path, 'static/avatars/nav', new_name))
 
         # Update user's avatar to the new image paths
         db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
@@ -325,9 +324,12 @@ def settings_usage(usage):
         global nav_avatar
         nav_avatar = session['nav_avatar']
         
-        context_processor()
 
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
         return redirect(url_for('settings'))
 
+
+@settings.context_processor
+def context_processor():
+    return dict(avatar_key=nav_avatar)
