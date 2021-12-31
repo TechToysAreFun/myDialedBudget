@@ -5,9 +5,9 @@ import datetime
 import re
 from application import db
 
-from account.utils import verify_reset_token, send_reset_email
-
 account = Blueprint('account', __name__)
+
+from application.account.utils import verify_reset_token, send_reset_email
 
 
 """ ---------- R E G I S T E R ------------------------------------------------------------------------------------------ """

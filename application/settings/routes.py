@@ -2,7 +2,7 @@ import os
 import secrets
 from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
-from application import  nav_avatar
+from application import  nav_avatar, app
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.helpers import login_required
 from application import db
@@ -10,11 +10,15 @@ from application import db
 settings = Blueprint('settings', __name__)
 
 
+@app.context_processor
+def context_processor():
+    return dict(avatar_key=nav_avatar)
+
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
 @settings.route('/settings')
 @login_required
-def settings():
+def settings_route():
 
     # Get all information from users table
     USERS = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])
@@ -110,7 +114,7 @@ def settings_usage(usage):
         for payee in db.execute("SELECT * FROM payees WHERE user_id = ? and bud_id = ?", session["user_id"], session["selected_bud"]):
             if new_name == payee['payee_name']:
                 flash("That payee name already exists.", "warning")
-                return redirect(url_for('settings.settings'))
+                return redirect(url_for('settings.settings_route'))
 
         # Update payee name in payees table
         db.execute("UPDATE payees SET payee_name = ? WHERE user_id = ? AND bud_id = ? AND payee_id = ?", new_name, session["user_id"], session["selected_bud"], payee_id)
@@ -119,7 +123,7 @@ def settings_usage(usage):
         db.execute("UPDATE trans SET payee = ? WHERE user_id = ? AND bud_id = ? AND payee = ?", new_name, session["user_id"], session["selected_bud"], old_name)
 
         flash('Payee name updated', 'success')
-        return redirect(url_for('settings.settings'))
+        return redirect(url_for('settings.settings_route'))
 
 
     if usage == "group_react":
@@ -133,7 +137,7 @@ def settings_usage(usage):
         db.execute("UPDATE cats SET active = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", 1, session["user_id"], session["selected_bud"], group_id )
 
         flash("Group and categories reactivated!", "success")
-        return redirect(url_for('settings.settings'))
+        return redirect(url_for('settings.settings_route'))
 
     if usage == "cat_react":
         # Get cat_id
@@ -143,7 +147,7 @@ def settings_usage(usage):
         db.execute("UPDATE cats SET active = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 1, session["user_id"], session["selected_bud"], cat_id)
 
         flash("Category reactivated!", "success")
-        return redirect(url_for('settings.settings'))
+        return redirect(url_for('settings.settings_route'))
 
     if usage == "pw_reset":
         # Get user input for existing pw, new pw, and confirmation
@@ -157,7 +161,7 @@ def settings_usage(usage):
         # Check that old password matches the existing password
         if not check_password_hash(USER[0]['password'], old):
             flash('Incorrect password', 'danger')
-            return redirect(url_for('settings.settings'))
+            return redirect(url_for('settings.settings_route'))
 
         # Check that new and confirm match
         if new == confirm:
@@ -171,7 +175,7 @@ def settings_usage(usage):
         else:
             flash('New passwords do not match', 'danger')
 
-        return redirect(url_for('settings.settings'))
+        return redirect(url_for('settings.settings_route'))
 
 
 
@@ -215,7 +219,7 @@ def settings_usage(usage):
 
             flash(f'Budget successfully deleted. Switched to: {new_bud[0]["bud_name"]}', 'success')
 
-            return redirect(url_for('settings.settings'))
+            return redirect(url_for('settings.settings_route'))
 
         # Else if no other budgets, return to index
         else:
@@ -277,7 +281,7 @@ def settings_usage(usage):
         # Check that a file extension exists
         if 'avatar_file' not in request.files:
             flash('No file part', 'warning')
-            return redirect(url_for('settings.settings'))
+            return redirect(url_for('settings.settings_route'))
 
         # Receive user's uploaded file from the form
         avatar = request.files['avatar_file']
@@ -323,13 +327,8 @@ def settings_usage(usage):
         session['nav_avatar'] = os.path.join('static/avatars/nav', new_name)
         global nav_avatar
         nav_avatar = session['nav_avatar']
-        
 
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
-        return redirect(url_for('settings.settings'))
+        return redirect(url_for('settings.settings_route'))
 
-
-@settings.context_processor
-def context_processor():
-    return dict(avatar_key=nav_avatar)
