@@ -1,16 +1,11 @@
-import os
-import secrets
-from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
-from flask_mail import Message
-from application import app, nav_avatar, mail
+from application import app, nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
 import datetime
 import re
-from application.helpers import login_required
 from application import db
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
+from account.utils import verify_reset_token, send_reset_email
 
 account = Blueprint('account', __name__)
 

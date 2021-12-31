@@ -1,15 +1,6 @@
-import os
-import secrets
-from PIL import Image
-from flask import flash, redirect, render_template, request, session, url_for, Blueprint
+from flask import url_for
 from flask_mail import Message
-from application import app, nav_avatar, mail
-from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
-import datetime
-import re
-from application.helpers import login_required
-from application import db
+from application import app, mail
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 """ ---------- E M A I L  R E S E T ------------------------------------------------------------------------------------------ """
@@ -18,6 +9,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 def get_reset_token(user_id, expires_sec=1800):
     s = Serializer(app.config['SECRET_KEY'], expires_sec)
     return s.dumps({'user_id': user_id}).decode('utf-8')
+
 
 def send_reset_email(user_id, email):
     # Create token for the user
@@ -33,7 +25,6 @@ def send_reset_email(user_id, email):
     '''
 
     mail.send(msg)
-
 
 
 def verify_reset_token(token):
