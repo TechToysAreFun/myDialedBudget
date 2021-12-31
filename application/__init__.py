@@ -50,4 +50,16 @@ nav_avatar = '/static/avatars/nav/default.png'
 
 
 # routes must be imported after the database is initialized above because routes uses the db.
-from application import routes
+from application.account.routes import account
+from application.allocations.routes import allocations
+from application.budget.routes import budget
+from application.history.routes import history
+from application.settings.routes import settings
+from application.transactions.routes import transactions
+
+app.register_blueprint(account)
+app.register_blueprint(allocations)
+app.register_blueprint(budget)
+app.register_blueprint(history)
+app.register_blueprint(settings)
+app.register_blueprint(transactions)

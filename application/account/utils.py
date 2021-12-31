@@ -19,7 +19,7 @@ def send_reset_email(user_id, email):
     msg = Message('Budget Buddy Password Reset', sender='mhart1992@gmail.com', recipients=[email])
     # Configure the body and pass the token parameter, as well as _external=True to tell python it's an external link
     msg.body = f'''Please use the link below to reset your Budget Buddy password.
-    {url_for('reset_token', token=token, _external=True)}
+    {url_for('account.reset_token', token=token, _external=True)}
 
     If you did not request a password change, simply ignore this email and no changes will be made.
     '''

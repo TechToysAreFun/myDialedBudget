@@ -44,7 +44,7 @@
     <nav class="navbar navbar-inverse fixed-top">
         <div class="container-fluid">
             <div class="navbar_header" style="font-size: x-large;">
-                <a class="navbar-brand" href=" {{ url_for('index') }}"><i class="fas fa-home"></i></a>
+                <a class="navbar-brand" href=" {{ url_for('budget.index') }}"><i class="fas fa-home"></i></a>
                 <span style="color: purple;"> B</span>
                 <span style="color: blue">u</span>
                 <span style="color: green">d</span>
@@ -62,8 +62,8 @@
             {% if session.user_id %}
             <ul class="nav navbar-nav navbar-right">
                 <form method="GET">
-                    <a href="{{ url_for('settings')}}"><img class="rounded-circle account-img pointer"
-                            src="{{ avatar_key }}" type="submit" {{ url_for('settings')}}"></a>
+                    <a href="{{ url_for('settings.settings')}}"><img class="rounded-circle account-img pointer"
+                            src="{{ avatar_key }}" type="submit" {{ url_for('settings.settings')}}"></a>
                     <button class=" btn" type="submit" formaction="/logout"><i class="fas fa-sign-out-alt"></i></button>
                 </form>
             </ul>
@@ -97,28 +97,28 @@
             <div class="col-sm-2 left_nav">
 
                 <!-- Budget row -->
-                <a href="{{ url_for('index') }}">
+                <a href="{{ url_for('budget.index') }}">
                     <div class="row left_nav_row">
                         <h3>Budget</h3>
                     </div>
                 </a>
 
                 <!-- Transactions row -->
-                <a href="{{ url_for('transactions') }}">
+                <a href="{{ url_for('history.transactions') }}">
                     <div class="row left_nav_row">
                         <h3>History</h3>
                     </div>
                 </a>
 
                 <!-- Allocate row -->
-                <a href="{{ url_for('allocate') }}">
+                <a href="{{ url_for('allocations.allocate') }}">
                     <div class="row left_nav_row">
                         <h3>Allocate</h3>
                     </div>
                 </a>
 
                 <!-- Post row -->
-                <a href="{{ url_for('expense') }}">
+                <a href="{{ url_for('transactions.expense') }}">
                     <div class="row left_nav_row">
                         <h3>Post</h3>
                     </div>

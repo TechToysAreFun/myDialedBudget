@@ -103,7 +103,7 @@ def index_usage(usage):
         db.execute("INSERT INTO groups (bud_id, user_id, group_name) VALUES (?, ?, ?)", selected_bud, session['user_id'], group_name)
 
         flash('Group created!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
 
@@ -123,7 +123,7 @@ def index_usage(usage):
         # Reject category name if it's "deposit" or "unassigned"
         if cat_name == 'Deposit' or cat_name == 'Unassigned':
             flash('Your budget automatically comes with that category.')
-            return redirect(url_for('index'))
+            return redirect(url_for('budget.index'))
 
 
         # Reject category name if it already exists in the same budget
@@ -134,7 +134,7 @@ def index_usage(usage):
                     flash('You already have that category name set to inactive. Reactivate in Settings page.', 'warning')
                 else:
                     flash('That category name already exists in this budget.')
-                return redirect(url_for('index'))
+                return redirect(url_for('budget.index'))
 
 
         # Update user's cat count in this group
@@ -152,7 +152,7 @@ def index_usage(usage):
         db.execute("INSERT INTO cats (group_id, bud_id, user_id, cat_name, cat_funded, cat_goal_met, cat_spent, cat_avail, due_tup_m, due_tup_d, cat_goal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", group_id, session['selected_bud'], session['user_id'], cat_name, 0, 0, 0, 0, due_month, due_day, cat_goal)
 
         flash('Category created!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
 
@@ -184,7 +184,7 @@ def index_usage(usage):
             for name in existing:
                 if new_name == name['cat_name']:
                     flash('That category already exists in your budget')
-                    return redirect(url_for('index'))
+                    return redirect(url_for('budget.index'))
 
             # Update cat_name
             db.execute("UPDATE cats SET cat_name = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", new_name, session['user_id'], session['selected_bud'], cat_id)
@@ -232,9 +232,9 @@ def index_usage(usage):
         flash('Category updated', 'success')
 
         if check_goal == False:
-            return redirect(url_for('index'))
+            return redirect(url_for('budget.index'))
         else:
-            return redirect(url_for('goal_check'))
+            return redirect(url_for('budget.goal_check'))
 
 
     """ Deactivate Category """
@@ -252,7 +252,7 @@ def index_usage(usage):
         db.execute("UPDATE groups SET active_cats = (active_cats - ?) WHERE user_id = ? AND bud_id = ? AND group_id = ?", 1, session['user_id'], session['selected_bud'], group_id)
 
         flash('Category deactivated', 'success')
-        return redirect(url_for('goal_check'))
+        return redirect(url_for('budget.goal_check'))
 
 
     """ Edit Group """
@@ -266,14 +266,14 @@ def index_usage(usage):
         for name in existing:
             if new_name == name['group_name']:
                 flash('That group already exists in your budget', 'warning')
-                return redirect(url_for('index'))
+                return redirect(url_for('budget.index'))
 
 
         # Rename the group
         db.execute("UPDATE groups SET group_name = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", new_name, session['user_id'], session['selected_bud'], group_id)
 
         flash('Group name updated', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
 
@@ -296,10 +296,10 @@ def index_usage(usage):
         db.execute("UPDATE groups SET active = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", 0, session['user_id'], session['selected_bud'], group_id)
 
         flash('Group deactivated', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
-    return redirect(url_for('index'))
+    return redirect(url_for('budget.index'))
 
 
 
@@ -365,4 +365,4 @@ def goal_check():
             # Do NOT reset
             db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 0, session['user_id'], session['selected_bud'], cat['cat_id'])
 
-    return redirect(url_for('index'))
+    return redirect(url_for('budget.index'))

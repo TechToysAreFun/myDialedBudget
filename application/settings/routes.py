@@ -77,7 +77,7 @@ def settings_usage(usage):
         db.execute("UPDATE users SET budgets = (budgets + ?) WHERE user_id = ?", 1, session['user_id'])
 
         flash(f"{bud_name} successfully created", "success")
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
     if usage == "switch":
@@ -98,7 +98,7 @@ def settings_usage(usage):
         db.execute("UPDATE users SET selected_bud = ? WHERE user_id = ?", session['selected_bud'], session['user_id'])
 
         flash(f"Switched to {bud_name}", "success")
-        return redirect(url_for('goal_check'))
+        return redirect(url_for('budget.goal_check'))
 
     if usage =="edit_payees":
         # Get form inputs
@@ -110,7 +110,7 @@ def settings_usage(usage):
         for payee in db.execute("SELECT * FROM payees WHERE user_id = ? and bud_id = ?", session["user_id"], session["selected_bud"]):
             if new_name == payee['payee_name']:
                 flash("That payee name already exists.", "warning")
-                return redirect(url_for('settings'))
+                return redirect(url_for('settings.settings'))
 
         # Update payee name in payees table
         db.execute("UPDATE payees SET payee_name = ? WHERE user_id = ? AND bud_id = ? AND payee_id = ?", new_name, session["user_id"], session["selected_bud"], payee_id)
@@ -119,7 +119,7 @@ def settings_usage(usage):
         db.execute("UPDATE trans SET payee = ? WHERE user_id = ? AND bud_id = ? AND payee = ?", new_name, session["user_id"], session["selected_bud"], old_name)
 
         flash('Payee name updated', 'success')
-        return redirect(url_for('settings'))
+        return redirect(url_for('settings.settings'))
 
 
     if usage == "group_react":
@@ -133,7 +133,7 @@ def settings_usage(usage):
         db.execute("UPDATE cats SET active = ? WHERE user_id = ? AND bud_id = ? AND group_id = ?", 1, session["user_id"], session["selected_bud"], group_id )
 
         flash("Group and categories reactivated!", "success")
-        return redirect(url_for('settings'))
+        return redirect(url_for('settings.settings'))
 
     if usage == "cat_react":
         # Get cat_id
@@ -143,7 +143,7 @@ def settings_usage(usage):
         db.execute("UPDATE cats SET active = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 1, session["user_id"], session["selected_bud"], cat_id)
 
         flash("Category reactivated!", "success")
-        return redirect(url_for('settings'))
+        return redirect(url_for('settings.settings'))
 
     if usage == "pw_reset":
         # Get user input for existing pw, new pw, and confirmation
@@ -157,7 +157,7 @@ def settings_usage(usage):
         # Check that old password matches the existing password
         if not check_password_hash(USER[0]['password'], old):
             flash('Incorrect password', 'danger')
-            return redirect(url_for('settings'))
+            return redirect(url_for('settings.settings'))
 
         # Check that new and confirm match
         if new == confirm:
@@ -171,7 +171,7 @@ def settings_usage(usage):
         else:
             flash('New passwords do not match', 'danger')
 
-        return redirect(url_for('settings'))
+        return redirect(url_for('settings.settings'))
 
 
 
@@ -215,7 +215,7 @@ def settings_usage(usage):
 
             flash(f'Budget successfully deleted. Switched to: {new_bud[0]["bud_name"]}', 'success')
 
-            return redirect(url_for('settings'))
+            return redirect(url_for('settings.settings'))
 
         # Else if no other budgets, return to index
         else:
@@ -226,7 +226,7 @@ def settings_usage(usage):
             db.execute("UPDATE users SET selected_bud = ? WHERE user_id = ?", '', session['user_id'])
 
             flash('Budget successfully deleted', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('budget.index'))
 
 
 
@@ -257,7 +257,7 @@ def settings_usage(usage):
         bud_name = db.execute("SELECT * FROM budgets WHERE user_id = ? AND bud_id = ?", session['user_id'], bud_id)[0]['bud_name']
 
         flash(f'{bud_name} successfully reset!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
 
@@ -268,7 +268,7 @@ def settings_usage(usage):
         db.execute("UPDATE budgets SET bud_name = ? WHERE user_id = ? AND bud_id = ?", new_bud_name, session['user_id'], session['selected_bud'])
 
         flash('Budget name updated', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
     
     # Update profile picture
@@ -277,7 +277,7 @@ def settings_usage(usage):
         # Check that a file extension exists
         if 'avatar_file' not in request.files:
             flash('No file part', 'warning')
-            return redirect(url_for('settings'))
+            return redirect(url_for('settings.settings'))
 
         # Receive user's uploaded file from the form
         avatar = request.files['avatar_file']
@@ -327,7 +327,7 @@ def settings_usage(usage):
 
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
-        return redirect(url_for('settings'))
+        return redirect(url_for('settings.settings'))
 
 
 @settings.context_processor

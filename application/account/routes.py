@@ -145,7 +145,7 @@ def login():
             name = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['first_name']
             flash(f'Hello, {name}!', 'primary')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
     else:
         return render_template('login.html', session=session, ptitle='Login')
@@ -160,7 +160,7 @@ def logout():
     session.clear()
 
     # Send user back to index, which requires login, which will redirect back to login.html
-    return redirect(url_for('index'))
+    return redirect(url_for('budget.index'))
     
 
 

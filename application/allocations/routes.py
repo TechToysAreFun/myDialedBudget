@@ -38,7 +38,7 @@ def allocate():
                 if float(db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND cat_id = ?", session['user_id'], session['selected_bud'], TO_ID)[0]['cat_goal']) == 0.00:
                     # A Goal isn't set
                     flash("This category doesn't have a goal yet", "warning")
-                    return redirect(url_for('index'))
+                    return redirect(url_for('budget.index'))
 
                 else:
                     # The goal is fully funded
@@ -47,7 +47,7 @@ def allocate():
                     fully_funded_check = True
 
                     flash("This category is already funded!", "success")
-                    return redirect(url_for('index'))
+                    return redirect(url_for('budget.index'))
 
 
         # Else, the request is coming from the Allocate page
@@ -65,12 +65,12 @@ def allocate():
         # Validate that all required fields were populated
         if not amount or not TO or not FROM:
             flash('Please complete all required fields', 'warning')
-            return redirect(url_for('allocate'))
+            return redirect(url_for('allocations.allocate'))
 
         # Validate that "amount" is a positive number
         if amount <= 0:
             flash('Only positive values may be allocated.', 'warning')
-            return redirect(url_for('allocate'))
+            return redirect(url_for('allocations.allocate'))
 
         # Check for sufficient funds when FROM is not 'Deposit'
         if FROM != 'Deposit':
@@ -78,7 +78,7 @@ def allocate():
             if amount > cat_avail:
                 required = amount - cat_avail
                 flash(f'Insufficient funds: ${"{:.2f}".format(required)} more needed in {FROM}', 'danger')
-                return redirect(url_for('allocate'))
+                return redirect(url_for('allocations.allocate'))
 
 
         # Update user's total_assets if from Deposit
@@ -134,14 +134,14 @@ def allocate():
         else:
             flash(f'Allocated ${"{:.2f}".format(amount)} to {TO}', 'success')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
     if request.method == "GET":
         # If user doesn't have a budget yet, alert them and return to index
         if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
             flash("You don't have a budget yet. Create one below!", "warning")
-            return redirect(url_for('index'))
+            return redirect(url_for('budget.index'))
 
         # Extract user's cats and feed to html form
         CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)

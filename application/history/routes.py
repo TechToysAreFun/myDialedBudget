@@ -12,7 +12,7 @@ def transactions():
      # If user doesn't have a budget yet, alert them and return to index
     if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
         flash("You don't have a budget yet. Create one below!", "warning")
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
     # Get user's transaction history and join to cats to know whether the cat is active and indicate that in the tables
     TRANS = db.execute("SELECT * FROM trans JOIN cats ON trans.cat_id = cats.cat_id WHERE trans.user_id = ? AND trans.bud_id = ? ORDER BY trans_date DESC", session['user_id'], session['selected_bud'])

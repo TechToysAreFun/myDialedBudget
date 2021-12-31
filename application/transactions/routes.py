@@ -24,7 +24,7 @@ def expense():
         # Validate that all required fields were populated
         if not amount or not payee or not cat or not date:
             flash('Please complete all required fields', 'warning')
-            return redirect(url_for('expense'))
+            return redirect(url_for('transactions.expense'))
 
         # Convert cat_name into cat_id
         cat_id = db.execute("SELECT * FROM cats WHERE cat_name = ? AND user_id = ?", cat, session['user_id'])[0]['cat_id']
@@ -36,7 +36,7 @@ def expense():
             required = amount - cat_avail
             # The following.   "{:.2f}".format()     formats a python float with 2 decilal points
             flash(f'Insufficient funds: ${"{:.2f}".format(required)} more needed in {cat}', 'danger')
-            return redirect(url_for('expense'))
+            return redirect(url_for('transactions.expense'))
 
         # First check if the cat goal has been fully funded
         goal_spent = CATS[0]['cat_goal_spent']
@@ -86,7 +86,7 @@ def expense():
         db.execute("UPDATE groups SET group_spent = (group_spent + ?), group_avail = (group_avail - ?) WHERE group_id = ? AND user_id = ?", amount, amount, group_id, session['user_id'])
 
 
-        return redirect(url_for('index'))
+        return redirect(url_for('budget.index'))
 
 
     if request.method == "GET":
@@ -94,7 +94,7 @@ def expense():
          # If user doesn't have a budget yet, alert them and return to index
         if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['budgets'] < 1:
             flash("You don't have a budget yet. Create one below!", "warning")
-            return redirect(url_for('index'))
+            return redirect(url_for('budget.index'))
 
         # Pass user's payees to the select input
         PAYEES = db.execute("SELECT * FROM payees WHERE user_id = ? AND bud_id = ?", session['user_id'], session['selected_bud'])

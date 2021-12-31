@@ -9,7 +9,7 @@
     <div class="col-sm-4"></div>
     <div class="col-sm-4">
         <h2>Login</h2>
-        <form action="{{ url_for('login') }}" method="POST">
+        <form action="{{ url_for('account.login') }}" method="POST">
             <div class="form-group">
                 <input type="text" name="username" class="form-control login-form" placeholder="Username"
                     autocomplete="off" autofocus>
@@ -19,7 +19,7 @@
             </div>
         </form>
         <br>
-        <form action="{{ url_for('reset_request') }}" method=" GET">
+        <form action="{{ url_for('account.reset_request') }}" method=" GET">
             <button type="submit" class="btn btn-default btn-sm border">Forgot Password?</button>
         </form>
     </div>
