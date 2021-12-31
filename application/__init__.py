@@ -1,9 +1,11 @@
+import os
 from cs50 import SQL
 from flask import Flask, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from application.helpers import usd
+from flask_mail import Mail
 
 # Configure application
 app = Flask(__name__)
@@ -11,7 +13,16 @@ app = Flask(__name__)
 # Maue sure the server auto-updates templates when any changes are made
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-app.config["SECRET_KEY"] = 'TEST'
+app.config["SECRET_KEY"] = os.environ.get('BUDGET_BUDDY_SECRET_KEY')
+
+# Configure gmail API
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('BUDGET_BUDDY_GMAIL_USER')
+app.config['MAIL_PASSWORD'] = os.environ.get('BUDGET_BUDDY_GMAIL_PASS')
+mail = Mail(app)
+
 
 # Make sure responses from requests aren't cached
 @app.after_request

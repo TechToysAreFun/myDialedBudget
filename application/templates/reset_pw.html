@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}
+{{ ptitle }}
+{% endblock title %}
+
+{% block login %}
+<div class="row" style="height: 200px;"></div>
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <h2>Reset Password</h2>
+        <form action="{{ url_for('submit_reset') }}" method="POST">
+            <div class="form-group">
+                <input type="text" name="token" value="{{ token }}" hidden>
+                <input type="password" name="password" class="form-control login-form"
+                    placeholder="Enter your new password" autocomplete="off" autofocus>
+                <input type="password" name="confirmation" class="form-control login-form"
+                    placeholder="Confirm your new password" autocomplete="off" autofocus>
+                <button type="submit" class="btn btn-primary">Reset Password</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-4"></div>
+</div>
+
+{% endblock login %}

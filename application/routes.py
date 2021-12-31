@@ -2,7 +2,8 @@ import os
 import secrets
 from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for
-from application import app, nav_avatar
+from flask_mail import Message
+from application import app, nav_avatar, mail
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 import datetime
@@ -780,6 +781,126 @@ def transactions():
     return render_template('transactions.html', trans=TRANS, allocs=ALLOCS, cats=CATS, ptitle='Transaction History')
 
 
+""" ---------- E M A I L  R E S E T ------------------------------------------------------------------------------------------ """
+# Serializer uses the apps SECRET_KEY to encide whatever criteria is returned in the 's.dumps' statement.
+# Deciding is done in the 'verify_reset_token(token)' function via 's.loads(token)[<criteria>]
+def get_reset_token(user_id, expires_sec=1800):
+    s = Serializer(app.config['SECRET_KEY'], expires_sec)
+    return s.dumps({'user_id': user_id}).decode('utf-8')
+
+def send_reset_email(user_id, email):
+    # Create token for the user
+    token = get_reset_token(user_id)
+
+    # Condifgure the subject, sender, and recipient/s
+    msg = Message('Budget Buddy Password Reset', sender='mhart1992@gmail.com', recipients=[email])
+    # Configure the body and pass the token parameter, as well as _external=True to tell python it's an external link
+    msg.body = f'''Please use the link below to reset your Budget Buddy password.
+    {url_for('reset_token', token=token, _external=True)}
+
+    If you did not request a password change, simply ignore this email and no changes will be made.
+    '''
+
+    mail.send(msg)
+
+
+
+def verify_reset_token(token):
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+        user_id = s.loads(token)['user_id']
+    except:
+        return None
+    
+    return user_id
+
+
+
+
+@app.route('/reset_pw', methods=['GET', 'POST'])
+def reset_request():
+
+        # Get all data from users table for both route methods
+        users = db.execute("SELECT * FROM users")
+        
+        # User clicked on "Forgot Password" button on login page
+        if request.method == "GET":
+            return render_template('request_reset.html')
+
+        # User submitted email address
+        if request.method == "POST":
+
+            # Get email address from form on request_reset.html
+            submitted_email = request.form.get('email')
+
+            # Validate that email is in the database
+            found = False
+            for user in users:
+                if submitted_email == user['email']:
+                    found = True
+                    break
+            
+            if found == False:
+                flash('That email is not registered with an account.', 'warning')
+                return render_template('request_reset.html', logged=0)
+
+            else:
+                # Email is valid. Get user_id associated with that email
+                user_id = db.execute("SELECT * FROM users WHERE email = ?", submitted_email)[0]['user_id']
+
+                # Pass user_id into email function
+                send_reset_email(user_id, submitted_email)
+
+                # Let user know that the email is sent then return them to login.html
+                flash(f'A reset email has successfully been sent to {submitted_email}', 'success')
+                return render_template('login.html', logged=0)
+        
+
+@app.route('/reset_pw/<token>', methods=['GET'])
+def reset_token(token):
+
+    # User is accessing the page via the link in their email, which also passes the <token> parameter
+
+    # verify_reset_token() returns 'None' if token is invalid or expired
+    if not verify_reset_token(token):
+        flash('That token is either expired or invalid.', 'warning')
+        return render_template('request_reset.html', logged=0)
+
+    else:
+        # User has been validated. Pass token to html so that it can be submited via POST back to this route
+        return render_template('reset_pw.html', token=token)
+
+
+@app.route('/submit_reset', methods=['POST'])
+def submit_reset():
+
+    token = request.form.get('token')
+        
+    # Verify token
+    if not verify_reset_token(token):
+        flash('It appears that your token has expired. Please make another reset request.', 'warning')
+        return render_template('request_reset.html', logged=0)
+
+    password = request.form.get('password')
+    confirmation = request.form.get('confirmation')
+
+    # Check that new password matches confirmation password
+    if password == confirmation:
+        # Hash new password
+        new_hashed = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+
+        # Reset password
+        db.execute("UPDATE users SET password = ? WHERE user_id = ?", new_hashed, verify_reset_token(token))
+        flash('Password successfully changed', 'success')
+        return render_template('login.html', logged=0)
+
+    else:
+        flash('New passwords do not match', 'danger')
+        return render_template('reset_pw.html', token=token, logged=0)
+
+
+        
+
 
 """ ---------- S E T T I N G S  /  U S A G E ------------------------------------------------------------------------------------------ """
 @app.route('/settings/<usage>', methods=["POST"])
@@ -1066,21 +1187,6 @@ def settings_usage(usage):
         flash('Avatar successfully updated', 'success')
         return redirect(url_for('settings'))
 
-    
-    if usage == 'reset_token':
-        # Get user ID and pass to get_reset_token()
-        user_id = session['user_id']
-
-        token = get_reset_token(user_id, 1800)
-
-        user = verify_reset_token(token)
-
-        return render_template('test.html', test=user)
-
-            
-
-
-
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
 @app.route('/settings')
@@ -1131,14 +1237,3 @@ def context_processor():
     return dict(avatar_key=nav_avatar)
 
 
-def get_reset_token(user_id, expires_sec=1800):
-            s = Serializer(app.config['SECRET_KEY'], expires_sec)
-            return s.dumps({'user_id': user_id}).decode('utf-8')
-
-def verify_reset_token(token):
-    s = Serializer(app.config['SECRET_KEY'])
-    try:
-        user_id = s.loads(token)['user_id']
-    except:
-        return None
-    return db.execute("SELECT user_id, first_name, last_name FROM users WHERE user_id = ?", user_id)
