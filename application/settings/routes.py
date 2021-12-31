@@ -2,7 +2,7 @@ import os
 import secrets
 from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
-from application import  nav_avatar, app
+from application import  nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.helpers import login_required
 from application import db
@@ -10,9 +10,7 @@ from application import db
 settings = Blueprint('settings', __name__)
 
 
-@app.context_processor
-def context_processor():
-    return dict(avatar_key=nav_avatar)
+
 
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """

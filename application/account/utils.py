@@ -1,13 +1,13 @@
-from flask import url_for
+from flask import url_for, current_app
 from flask_mail import Message
-from application import app, mail
+from application import mail
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 """ ---------- E M A I L  R E S E T ------------------------------------------------------------------------------------------ """
 # Serializer uses the apps SECRET_KEY to encide whatever criteria is returned in the 's.dumps' statement.
 # Deciding is done in the 'verify_reset_token(token)' function via 's.loads(token)[<criteria>]
 def get_reset_token(user_id, expires_sec=1800):
-    s = Serializer(app.config['SECRET_KEY'], expires_sec)
+    s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
     return s.dumps({'user_id': user_id}).decode('utf-8')
 
 
@@ -28,7 +28,7 @@ def send_reset_email(user_id, email):
 
 
 def verify_reset_token(token):
-    s = Serializer(app.config['SECRET_KEY'])
+    s = Serializer(current_app.config['SECRET_KEY'])
     try:
         user_id = s.loads(token)['user_id']
     except:
