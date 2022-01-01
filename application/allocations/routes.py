@@ -2,7 +2,7 @@
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
 import datetime
 from application.helpers import login_required
-from application import db
+from application import db, nav_avatar
 
 allocations = Blueprint('allocations', __name__)
 
@@ -147,3 +147,9 @@ def allocate():
         CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
 
         return render_template('allocate.html', cats=CATS, ptitle='Allocate Funds')
+
+
+
+@allocations.context_processor
+def context_processor():
+    return dict(avatar_key=session['nav_avatar'])

@@ -9,14 +9,14 @@ from application.config import Config
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///application/final.db")
 
-# Set global variable that will hold the user's navbar avatar
-nav_avatar = '/static/avatars/nav/default.png'
-
 # Create instance of 'mail' for this application
 mail = Mail()
 
 # Create instance of 'Session' for this application
 session = Session()
+
+# Set global variable that will hold the user's navbar avatar
+nav_avatar = 'static/avatars/nav/default.png'
 
 
 def create_app(config_class=Config):
@@ -24,11 +24,6 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     # Set application to use configurations in config.py
     app.config.from_object(Config)
-
-    with app.app_context():
-        @current_app.context_processor
-        def context_processor():
-            return dict(avatar_key=nav_avatar)
 
     mail.init_app(app)
     session.init_app(app)

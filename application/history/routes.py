@@ -1,6 +1,6 @@
 from flask import flash, redirect, render_template, session, url_for, Blueprint
 from application.helpers import login_required
-from application import db
+from application import db, nav_avatar
 
 history = Blueprint('history', __name__)
 
@@ -24,3 +24,9 @@ def transactions():
     CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ?", session['user_id'], session['selected_bud'])
 
     return render_template('transactions.html', trans=TRANS, allocs=ALLOCS, cats=CATS, ptitle='Transaction History')
+
+
+
+@history.context_processor
+def context_processor():
+    return dict(avatar_key=session['nav_avatar'])

@@ -1,6 +1,6 @@
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
 from application.helpers import login_required
-from application import db
+from application import db, nav_avatar
 
 budget = Blueprint('budget', __name__)
 
@@ -68,9 +68,11 @@ def index():
     GROUPS = db.execute("SELECT * FROM groups WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
     CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
 
+    global nav_avatar
+    nav_avatar = session['nav_avatar']
 
     # Send the user's groups, cats, and calculated totals to index.html
-    return render_template('index.html', has_budget=has_budget, budget=BUDGET, groups=GROUPS, cats=CATS, totals=TOTALS, ptitle='Budget')
+    return render_template('index.html', has_budget=has_budget, budget=BUDGET, groups=GROUPS, cats=CATS, totals=TOTALS, ptitle='Budget', test=nav_avatar, test2=session['nav_avatar'])
 
 
 
@@ -366,3 +368,8 @@ def goal_check():
             db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 0, session['user_id'], session['selected_bud'], cat['cat_id'])
 
     return redirect(url_for('budget.index'))
+
+
+@budget.context_processor
+def context_processor():
+    return dict(avatar_key=nav_avatar)

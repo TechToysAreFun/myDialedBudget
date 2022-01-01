@@ -2,15 +2,12 @@ import os
 import secrets
 from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
-from application import  nav_avatar
+from application import nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.helpers import login_required
 from application import db
 
 settings = Blueprint('settings', __name__)
-
-
-
 
 
 """ ---------- S E T T I N G S  ------------------------------------------------------------------------------------------ """
@@ -38,7 +35,6 @@ def settings_route():
 
         # Get user's deactivated cats that are not in deactivated groups
         CATSex = db.execute("SELECT * FROM cats JOIN groups ON cats.group_id = groups.group_id WHERE cats.user_id = ? AND cats.bud_id = ? AND cats.active = ? AND groups.active = ?", session['user_id'], session['selected_bud'], 0, 1)
-    
 
         return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings', avatar=session['avatar'])
 
@@ -323,10 +319,11 @@ def settings_usage(usage):
         # Update session for settings page and navbar image
         session['avatar'] = os.path.join('static/avatars', new_name)
         session['nav_avatar'] = os.path.join('static/avatars/nav', new_name)
-        global nav_avatar
-        nav_avatar = session['nav_avatar']
 
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
         return redirect(url_for('settings.settings_route'))
 
+@settings.context_processor
+def context_processor():
+    return dict(avatar_key=session['nav_avatar'])

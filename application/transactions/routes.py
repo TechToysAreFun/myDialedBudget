@@ -1,7 +1,7 @@
 
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
 from application.helpers import login_required
-from application import db
+from application import db, nav_avatar
 
 
 transactions = Blueprint('transactions', __name__)
@@ -103,3 +103,8 @@ def expense():
         CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id = ? AND active = ?", session['user_id'], session['selected_bud'], 1)
 
         return render_template('expense.html', payees=PAYEES, cats=CATS, ptitle='Post Transaction')
+
+
+@transactions.context_processor
+def context_processor():
+    return dict(avatar_key=session['nav_avatar'])

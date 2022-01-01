@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request, session, url_for, Blueprint
+from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
 from application import nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
@@ -8,6 +8,7 @@ from application import db
 account = Blueprint('account', __name__)
 
 from application.account.utils import verify_reset_token, send_reset_email
+
 
 
 """ ---------- R E G I S T E R ------------------------------------------------------------------------------------------ """
@@ -134,9 +135,6 @@ def login():
         session['avatar'] = USER[0]['avatar']
         session['nav_avatar'] = USER[0]['nav_avatar']
 
-        global nav_avatar
-        nav_avatar = session['nav_avatar']
-
         # Redirect user to homepage (index)
         if db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['is_first_login'] == 1:
             db.execute("UPDATE users SET is_first_login = ? WHERE user_id = ?", 0, session['user_id'])
@@ -245,3 +243,4 @@ def submit_reset():
     else:
         flash('New passwords do not match', 'danger')
         return render_template('reset_pw.html', token=token, logged=0)
+

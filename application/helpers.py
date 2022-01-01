@@ -27,3 +27,8 @@ def usd(value):
 #     response.headers["Expires"] = 0
 #     response.headers["Pragma"] = "no-cache"
 #     return response
+
+
+def global_var_change(new_value):
+    global nav_avatar
+    nav_avatar = new_value
