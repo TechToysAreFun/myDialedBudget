@@ -18,17 +18,3 @@ def login_required(f):
 def usd(value):
     """Format value as USD."""
     return f"${value:,.2f}"
-
-
-# # Make sure responses from requests aren't cached
-# @current_app.after_request
-# def after_request(response):
-#     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-#     response.headers["Expires"] = 0
-#     response.headers["Pragma"] = "no-cache"
-#     return response
-
-
-def global_var_change(new_value):
-    global nav_avatar
-    nav_avatar = new_value

@@ -7,7 +7,7 @@ from flask_mail import Mail
 from application.config import Config
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///application/final.db")
+db = SQL("sqlite:///application/budget_buddy.db")
 
 # Create instance of 'mail' for this application
 mail = Mail()
@@ -44,5 +44,14 @@ def create_app(config_class=Config):
     app.register_blueprint(history)
     app.register_blueprint(settings)
     app.register_blueprint(transactions)
+
+    with app.app_context():
+        # Make sure responses from requests aren't cached
+        @app.after_request
+        def after_request(response):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Expires"] = 0
+            response.headers["Pragma"] = "no-cache"
+            return response
 
     return app
