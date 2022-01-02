@@ -31,19 +31,23 @@ def create_app(config_class=Config):
     # Create custom filter
     app.jinja_env.filters["usd"] = usd
 
+    # Import blueprints
     from application.account.routes import account
     from application.allocations.routes import allocations
     from application.budget.routes import budget
     from application.history.routes import history
     from application.settings.routes import settings
     from application.transactions.routes import transactions
+    from application.errors.handlers import errors
 
+    # Register blueprints
     app.register_blueprint(account)
     app.register_blueprint(allocations)
     app.register_blueprint(budget)
     app.register_blueprint(history)
     app.register_blueprint(settings)
     app.register_blueprint(transactions)
+    app.register_blueprint(errors)
 
     with app.app_context():
         # Make sure responses from requests aren't cached

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}
+{{ ptitle }}
+{% endblock title %}
+
+{% if logged %}
+<!-- SHOW LOGGED-IN TAMPLATE -->
+{% block main %}
+<div class="row">
+    <div class="col-sm-10">
+        <h2>Oops. We are unable to find that page.</h2>
+        <p>If you've reached this page via a link, we are sorry for the inconvenience and are working to fix this issue.
+        </p>
+    </div>
+</div>
+
+{% endblock main %}
+
+{% else %}
+<!-- SHOW NOT-LOGGED-IN TAMPLATE -->
+{% block login %}
+<div class="row" style="height: 200px;"></div>
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <h2>Oops! We are unable to find that page.</h2>
+        <p>If you've reached this page via a link, we appologize for the inconvenience and are working to fix this
+            issue.
+        </p>
+    </div>
+    <div class="col-sm-4"></div>
+</div>
+{% endblock login %}
+
+{% endif %}

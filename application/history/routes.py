@@ -1,6 +1,6 @@
 from flask import flash, redirect, render_template, session, url_for, Blueprint
 from application.helpers import login_required
-from application import db, nav_avatar
+from application import db
 
 history = Blueprint('history', __name__)
 

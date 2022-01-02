@@ -171,7 +171,7 @@ def reset_request():
         
         # User clicked on "Forgot Password" button on login page
         if request.method == "GET":
-            return render_template('request_reset.html')
+            return render_template('request_reset.html', ptitle="Request Password Reset", logged=0)
 
         # User submitted email address
         if request.method == "POST":
@@ -188,7 +188,7 @@ def reset_request():
             
             if found == False:
                 flash('That email is not registered with an account.', 'warning')
-                return render_template('request_reset.html', logged=0)
+                return render_template('request_reset.html', ptitle="Request Password Reset", logged=0)
 
             else:
                 # Email is valid. Get user_id associated with that email
@@ -199,7 +199,7 @@ def reset_request():
 
                 # Let user know that the email is sent then return them to login.html
                 flash(f'A reset email has successfully been sent to {submitted_email}', 'success')
-                return render_template('login.html', logged=0)
+                return render_template('login.html', ptitle="Login", logged=0)
         
 
 @account.route('/reset_pw/<token>', methods=['GET'])
@@ -210,11 +210,11 @@ def reset_token(token):
     # verify_reset_token() returns 'None' if token is invalid or expired
     if not verify_reset_token(token):
         flash('That token is either expired or invalid.', 'warning')
-        return render_template('request_reset.html', logged=0)
+        return render_template('request_reset.html', ptitle="Request Password Reset", logged=0)
 
     else:
         # User has been validated. Pass token to html so that it can be submited via POST back to this route
-        return render_template('reset_pw.html', token=token)
+        return render_template('reset_pw.html', ptitle="Reset Password", token=token, logged=0)
 
 
 @account.route('/submit_reset', methods=['POST'])
@@ -225,7 +225,7 @@ def submit_reset():
     # Verify token
     if not verify_reset_token(token):
         flash('It appears that your token has expired. Please make another reset request.', 'warning')
-        return render_template('request_reset.html', logged=0)
+        return render_template('request_reset.html', ptitle="Request Password Reset", logged=0)
 
     password = request.form.get('password')
     confirmation = request.form.get('confirmation')
@@ -238,9 +238,9 @@ def submit_reset():
         # Reset password
         db.execute("UPDATE users SET password = ? WHERE user_id = ?", new_hashed, verify_reset_token(token))
         flash('Password successfully changed', 'success')
-        return render_template('login.html', logged=0)
+        return render_template('login.html', ptitle="Login", logged=0)
 
     else:
         flash('New passwords do not match', 'danger')
-        return render_template('reset_pw.html', token=token, logged=0)
+        return render_template('reset_pw.html', token=token, ptitle="Reset Password", logged=0)
 
