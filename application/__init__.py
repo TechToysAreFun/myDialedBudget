@@ -7,7 +7,7 @@ from flask_mail import Mail
 from application.config import Config
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///application/budget_buddy.db")
+db = SQL("sqlite:///application/mydialedbudget.db")
 
 # Create instance of 'mail' for this application
 mail = Mail()
