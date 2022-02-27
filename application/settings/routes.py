@@ -336,23 +336,26 @@ def settings_usage(usage):
     # Delete user account
     if usage == "delete_account":
 
+        # Store user id in temp variable
+        temp_id = session['user_id']
+
         # Delete from trans
-        db.execute('DELETE FROM trans WHERE user_id = ?', session['user_id'])
+        db.execute('DELETE FROM trans WHERE user_id = ?', temp_id)
 
         # Delete from allocs
-        db.execute('DELETE FROM allocs WHERE user_id = ?', session['user_id'])
-
-        # Delete from budgets
-        db.execute('DELETE FROM budgets WHERE user_id = ?', session['user_id'])
+        db.execute('DELETE FROM allocs WHERE user_id = ?', temp_id)
 
         # Delete from payees
-        db.execute('DELETE FROM payees WHERE user_id = ?', session['user_id'])
+        db.execute('DELETE FROM payees WHERE user_id = ?', temp_id)
 
         # Delete from cats
-        db.execute('DELETE FROM cats WHERE user_id = ?', session['user_id'])
+        db.execute('DELETE FROM cats WHERE user_id = ?', temp_id)
+
+        # Delete from budgets
+        db.execute('DELETE FROM budgets WHERE user_id = ?', temp_id)
 
         # Delete from users
-        db.execute('DELETE FROM users WHERE user_id = ?', session['user_id'])
+        db.execute('DELETE FROM users WHERE user_id = ?', temp_id)
 
         # Delete user avatars if they are NOT the default avatar
         if os.path.exists(session['avatar']):

@@ -67,16 +67,26 @@
                         </tr>
                         <tr>
                             <th colspan="2">
-                                <button id="pw_reset_btn" class="btn btn-primary"
-                                    onclick="display_toggle(this.id, 'pw_reset_form', 'pw_reset_cancel_btn')">Change
+                                <button id="pw_reset_btn" class="btn btn-primary btn-sm"
+                                    onclick="display_toggle(this.id, 'del_acct_btn', 'pw_reset_form', 'pw_reset_cancel_btn')">Update
                                     Password</button>
-                                <button id="pw_reset_cancel_btn" class="btn btn-danger" style="display: none"
-                                    onclick="display_toggle(this.id, 'pw_reset_form', 'pw_reset_btn')">Cancel</button>
+                                <button id="pw_reset_cancel_btn" class="btn btn-danger btn-sm" style="display: none"
+                                    onclick="display_toggle(this.id, 'del_acct_btn', 'pw_reset_form', 'pw_reset_btn')">Cancel</button>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">
+                                <button id="del_acct_btn" class="btn btn-danger btn-sm"
+                                    onclick="display_toggle(this.id, 'pw_reset_btn', 'del_acct_form', 'del_acct_cancel_btn')">Delete
+                                    Account</button>
+                                <button id="del_acct_cancel_btn" class="btn btn-success btn-sm" style="display: none"
+                                    onclick="display_toggle(this.id, 'pw_reset_btn', 'del_acct_form', 'del_acct_btn')">Cancel</button>
                             </th>
                         </tr>
                     </tbody>
                     {% endfor %}
                 </table>
+                <!-- RESET PASSWORD FORM -->
                 <form id="pw_reset_form" style="display: none"
                     action="{{ url_for('settings.settings_usage', usage='pw_reset')}}" method="post">
                     <div class="form-group">
@@ -86,7 +96,19 @@
                             placeholder="New password">
                         <input type="password" name="confirm" class="form-control" autocomplete="off" required
                             placeholder="Confirm password">
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    </div>
+                </form>
+
+                <!-- DELETE BUDGET FORM -->
+                <form id="del_acct_form" style="display: none"
+                    action="{{ url_for('settings.settings_usage', usage='delete_account')}}" method="post">
+                    <div class="form-group">
+                        <div class="alert-danger">
+                            <p><strong>Deleting your account is permanent. Are you sure you want to remove all of your
+                                    data?</strong></p>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm">Delete Account</button>
                     </div>
                 </form>
             </div>
@@ -119,7 +141,7 @@
                                 autocomplete="off" autofocus required>
                             <input type="number" step="0.01" min="0.01" name="total_assets" class="form-control"
                                 placeholder="Current Assets" autocomplete="off" required>
-                            <button type="submit" class="btn btn-primary">Create</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Create</button>
                         </div>
                     </form>
                 </div>
@@ -145,7 +167,7 @@
                                 {% endif %}
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-primary">Switch</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Switch</button>
                         </div>
                     </form>
                 </div>
@@ -171,14 +193,14 @@
                                 {% endif %}
                                 {% endfor %}
                             </select>
-                            <button type="button" id="bud_reset_btn" class="btn btn-warning"
+                            <button type="button" id="bud_reset_btn" class="btn btn-warning btn-sm"
                                 onclick="display_toggle(this.id, 'bud_reset_confirm')">Reset</button>
                             <div id="bud_reset_confirm" style="display: none" class="alert alert-warning">
                                 <p>This will delete all transactions & allocations but will retain your groups,
                                     categories, and payees.</p>
-                                <button type="button" class="btn btn-primary"
+                                <button type="button" class="btn btn-primary btn-sm"
                                     onclick="display_toggle('bud_reset_confirm', 'bud_reset_btn')">Cancel</button>
-                                <button type="submit" class="btn btn-warning">Confirm Reset</button>
+                                <button type="submit" class="btn btn-warning btn-sm">Confirm Reset</button>
                             </div>
                         </div>
                     </form>
@@ -206,12 +228,12 @@
                                 {% endfor %}
                             </select>
                             <button type="button" id="delete_bud" onclick="display_toggle(this.id, 'del_bud_conf')"
-                                class="btn btn-danger">Delete</button>
+                                class="btn btn-danger btn-sm">Delete</button>
                             <div id="del_bud_conf" style="display: none" class="alert alert-warning">
                                 <p>Once deleted, your budget will not be recoverable</p>
-                                <button type="button" class="btn btn-primary"
+                                <button type="button" class="btn btn-primary btn-sm"
                                     onclick="display_toggle('del_bud_conf', 'delete_bud')">Cancel</button>
-                                <button type="submit" class="btn btn-danger">Confirm Deletion</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Confirm Deletion</button>
                             </div>
                         </div>
                     </form>
