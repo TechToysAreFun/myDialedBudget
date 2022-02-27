@@ -82,7 +82,7 @@ def index():
 @login_required
 def index_usage(usage):
 
-    """ Functions that every Usage reqires """
+    """ Functions that every 'Usage' reqires """
     # Determine current budget id
     selected_bud = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['selected_bud']
 
@@ -310,7 +310,7 @@ def index_usage(usage):
 @login_required
 def goal_check():
 
-    """ The actual goal resetting occurs in the index route (based on the bool value of 'reset' for each cat) so that the data is always revaluated everytime the budget table is displayed """
+    """ The actual goal resetting occurs in the index route (based on the bool value of 'reset' for each budget category "cat") so that the data is always revaluated everytime the budget table is displayed """
 
     # Get user's categories for the selected budget
     CATS = db.execute("SELECT * FROM cats WHERE user_id = ? AND bud_id= ?", session['user_id'], session['selected_bud'])
@@ -337,7 +337,7 @@ def goal_check():
 
             # This is the formula where the new year-exception is not True
             else:
-                # Check if the next month has arrived by subtracting this months numeric value by last months, and checking for > 0
+                # Check if the next month has arrived by subtracting this months numeric value by the due month numeric value
                 if (int(session['day_tup'][0]) - int(cat['due_tup_m'])) > 0:
 
                     # Due day has passed since this month is after the due month, reset.
