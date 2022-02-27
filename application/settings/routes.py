@@ -312,6 +312,14 @@ def settings_usage(usage):
         i.thumbnail(nav_size)
         i.save(os.path.join(current_app.root_path, 'static/avatars/nav', new_name))
 
+        # If the user's current avatar is NOT the default, then delete it
+        if os.path.exists(session['avatar']):
+            if session['avatar'] != "application/static/avatars/default.png":
+                os.remove(session['avatar'])
+        if os.path.exists(session['nav_avatar']):
+            if session['nav_avatar'] != "application/static/avatars/nav/default.png":
+                os.remove(session['nav_avatar'])
+        
         # Update user's avatar to the new image paths
         db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
         db.execute("UPDATE users SET nav_avatar = ? WHERE user_id = ?", os.path.join('static/avatars/nav', new_name), session['user_id'])
@@ -323,6 +331,43 @@ def settings_usage(usage):
         # Redirect to settings
         flash('Avatar successfully updated', 'success')
         return redirect(url_for('settings.settings_route'))
+
+
+    # Delete user account
+    if usage == "delete_account":
+
+        # Delete from trans
+        db.execute('DELETE FROM trans WHERE user_id = ?', session['user_id'])
+
+        # Delete from allocs
+        db.execute('DELETE FROM allocs WHERE user_id = ?', session['user_id'])
+
+        # Delete from budgets
+        db.execute('DELETE FROM budgets WHERE user_id = ?', session['user_id'])
+
+        # Delete from payees
+        db.execute('DELETE FROM payees WHERE user_id = ?', session['user_id'])
+
+        # Delete from cats
+        db.execute('DELETE FROM cats WHERE user_id = ?', session['user_id'])
+
+        # Delete from users
+        db.execute('DELETE FROM users WHERE user_id = ?', session['user_id'])
+
+        # Delete user avatars if they are NOT the default avatar
+        if os.path.exists(session['avatar']):
+            if session['avatar'] != "application/static/avatars/default.png":
+                os.remove(session['avatar'])
+        if os.path.exists(session['nav_avatar']):
+            if session['nav_avatar'] != "application/static/avatars/nav/default.png":
+                os.remove(session['nav_avatar'])
+
+        # Clear session / log out
+        session.clear()
+
+        # Redirect to index
+        return redirect(url_for('budget.index'))
+
 
 @settings.context_processor
 def context_processor():
