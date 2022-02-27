@@ -144,7 +144,7 @@
                                 id="new_cat_goal_{{ group.group_id }}" class="form-control" style="display: none"
                                 placeholder="Goal Amount" autocomplete="off">
                             <input type="number" name="due" id="new_cat_date_{{ group.group_id }}"
-                                placeholder="Needed By Day" min="1" max="28" class="form-control" style="display:none">
+                                placeholder="Needed By Day" min="1" max="31 class=" form-control" style="display:none">
                             <input type="hidden" name="group_id" value="{{ group.group_id }}">
                             <button type="submit" id="submit_new_cat_{{ group.group_id }}" class="btn btn-primary"
                                 style="display: none;">Create</button>
@@ -224,7 +224,8 @@
                     <td class="right_align">
                         {% if category.due_tup_d %}
                         <!-- HANDLE LETTERING FOR NUMBERS (st, nd, rd, th) i,e,. 1st, 2nd, 3rd, etc. -->
-                        {% if ((category.due_tup_d == '1') or (category.due_tup_d == '21')) %}
+                        {% if ((category.due_tup_d == '1') or (category.due_tup_d == '21') or (category.due_tup_d ==
+                        '31')) %}
                         {{ category.due_tup_d }}st
 
                         {% elif ((category.due_tup_d == '2') or (category.due_tup_d == '22')) %}
@@ -259,7 +260,7 @@
                                 <input type="text" name="cat_id" hidden value="{{ category.cat_id }}">
                                 <input type="number" name="new_goal" min="0.01" step="0.01" class="form-control"
                                     placeholder="Goal" autocomplete="off">
-                                <input type="number" name="new_due" min="1" max="28" class="form-control"
+                                <input type="number" name="new_due" min="1" max="31" class="form-control"
                                     placeholder="Needed By Day" autocomplete="off">
                                 <input type="text" name="new_name" class="form-control" placeholder="Name"
                                     autocomplete="off">

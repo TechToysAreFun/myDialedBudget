@@ -321,26 +321,20 @@ def goal_check():
         # Check if a due day exists for this cat, if not, skip entirely and set reset to false
         if cat['due_tup_d']:
 
-            # Because my formula to calculate whether a reset is required is: (if current month - goal month > 0 AND current day - goal day > 0), Check if the new year elapsed since goal due day because if so,
-            # this is the one exception to the formula, because 1 - 12 !> 0 (Dec to Jan), but the next month has in fact, arrived
+            # Formula to determine if a reset is required checks if the current month is  equal to the due month and if so, if the current day is greater than the due day. Exception to the first check is when the new year has elapsed.
+            
+            # Check for new year exception first:
             if session['day_tup'][0] == 1 and cat['due_tup_m'] == 12:
-
-                # If so, simply check if today is after the due day
-                if session['day_tup'][1] > cat['due_tup_d']:
-
-                    # Reset
-                    db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 1, session['user_id'], session['selected_bud'], cat['cat_id'])
-
-                else:
-                    # Do NOT reset
-                    db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 0, session['user_id'], session['selected_bud'], cat['cat_id'])
+                
+                # Reset
+                db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 1, session['user_id'], session['selected_bud'], cat['cat_id'])
 
             # This is the formula where the new year-exception is not True
             else:
-                # Check if the next month has arrived by subtracting this months numeric value by the due month numeric value
+                # Check if current month is PAST due month
                 if (int(session['day_tup'][0]) - int(cat['due_tup_m'])) > 0:
 
-                    # Due day has passed since this month is after the due month, reset.
+                    # Due day has passed by default since this month is after the due month, so reset.
                     db.execute("UPDATE cats SET reset = ? WHERE user_id = ? AND bud_id = ? AND cat_id = ?", 1, session['user_id'], session['selected_bud'], cat['cat_id'])
 
                 # Check if the due month is this month
@@ -354,7 +348,7 @@ def goal_check():
 
                 else:
 
-                    # Check if the due month AND the due day is next month, which would indicate the due date had just been changed to a future date of the current month
+                    # Check if the due month AND the due day is next month, which happens when the user sets a new due day prior to the current day (which sets the due month to next month) and then the user changes it again to a due day past current day. 
                     if ((int(session['day_tup'][0]) < int(cat['due_tup_m'])) and (session['day_tup'][1] < cat['due_tup_d'])):
 
                         # Change back the due month to the current month and do NOT reset
