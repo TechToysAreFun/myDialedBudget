@@ -16,6 +16,7 @@ mail = Mail()
 session = Session()
 
 # Set global variable that will hold the user's navbar avatar
+global nav_avatar
 nav_avatar = 'static/avatars/nav/default.png'
 
 
@@ -30,6 +31,8 @@ def create_app(config_class=Config):
 
     # Create custom filter
     app.jinja_env.filters["usd"] = usd
+
+    
 
     # Import blueprints
     from application.account.routes import account

@@ -360,10 +360,10 @@ def settings_usage(usage):
         # Delete user avatars if they are NOT the default avatar
         if os.path.exists(session['avatar']):
             if session['avatar'] != "application/static/avatars/default.png":
-                os.remove(session['avatar'])
+                os.remove("application/" + session['avatar'])
         if os.path.exists(session['nav_avatar']):
             if session['nav_avatar'] != "application/static/avatars/nav/default.png":
-                os.remove(session['nav_avatar'])
+                os.remove("application/" + session['nav_avatar'])
 
         # Clear session / log out
         session.clear()

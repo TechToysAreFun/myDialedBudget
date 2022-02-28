@@ -366,4 +366,4 @@ def goal_check():
 
 @budget.context_processor
 def context_processor():
-    return dict(avatar_key=nav_avatar)
+    return dict(avatar_key=session['nav_avatar'])
