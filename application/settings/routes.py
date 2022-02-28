@@ -1,4 +1,6 @@
+from __future__ import print_function
 import os
+import sys
 import secrets
 from PIL import Image
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
@@ -37,8 +39,11 @@ def settings_route():
         CATSex = db.execute("SELECT * FROM cats JOIN groups ON cats.group_id = groups.group_id WHERE cats.user_id = ? AND cats.bud_id = ? AND cats.active = ? AND groups.active = ?", session['user_id'], session['selected_bud'], 0, 1)
 
         return render_template('settings.html', budgets=BUDGETS, payees=PAYEES, groups=GROUPS, catsinc=CATSinc, catsex=CATSex, users=USERS, ptitle='Account Settings', avatar=session['avatar'])
+        
 
-    return render_template('settings.html', users=USERS, ptitle='Account Settings', avatar=session['avatar'])
+    print('Hello world!', file=sys.stderr)
+
+    return render_template('settings.html', users=USERS, ptitle='Account Settings', avatar=session['avatar'], path=current_app.root_path)
 
 
 """ ---------- S E T T I N G S  /  U S A G E ------------------------------------------------------------------------------------------ """
@@ -313,12 +318,10 @@ def settings_usage(usage):
         i.save(os.path.join(current_app.root_path, 'static/avatars/nav', new_name))
 
         # If the user's current avatar is NOT the default, then delete it
-        if os.path.exists(session['avatar']):
-            if session['avatar'] != "application/static/avatars/default.png":
-                os.remove(session['avatar'])
-        if os.path.exists(session['nav_avatar']):
-            if session['nav_avatar'] != "application/static/avatars/nav/default.png":
-                os.remove(session['nav_avatar'])
+        if session['avatar'] != "static/avatars/default.png":
+            os.remove(current_app.root_path + "/" + session['avatar'])
+        if session['nav_avatar'] != "static/avatars/nav/default.png":
+            os.remove(current_app.root_path + "/" + session['nav_avatar'])
         
         # Update user's avatar to the new image paths
         db.execute("UPDATE users SET avatar = ? WHERE user_id = ?", os.path.join('static/avatars', new_name), session['user_id'])
@@ -358,12 +361,10 @@ def settings_usage(usage):
         db.execute('DELETE FROM users WHERE user_id = ?', temp_id)
 
         # Delete user avatars if they are NOT the default avatar
-        if os.path.exists(session['avatar']):
-            if session['avatar'] != "application/static/avatars/default.png":
-                os.remove("application/" + session['avatar'])
-        if os.path.exists(session['nav_avatar']):
-            if session['nav_avatar'] != "application/static/avatars/nav/default.png":
-                os.remove("application/" + session['nav_avatar'])
+        if session['avatar'] != "static/avatars/default.png":
+            os.remove(current_app.root_path + "/" + session['avatar'])
+        if session['nav_avatar'] != "static/avatars/nav/default.png":
+            os.remove(current_app.root_path + "/" + session['nav_avatar'])
 
         # Clear session / log out
         session.clear()
