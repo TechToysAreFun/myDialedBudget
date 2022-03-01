@@ -131,9 +131,10 @@
             <div class="col-sm-2"></div>
 
 
-            <!-- Main area where budget table lives is stored in the remaining 9 columns -->
+            <!-- Main area where all page content lives is stored in the remaining 10 columns -->
             <div class="col-sm-10 main-group">
 
+                <!-- Flash messages within this col so that it doesn't overlay the left nav bar -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                 {% for category, message in messages %}
