@@ -1,5 +1,6 @@
 import os
 from tempfile import mkdtemp
+from datetime import timedelta
 
 class Config:
     # Maue sure the server auto-updates templates when any changes are made
@@ -7,8 +8,7 @@ class Config:
 
     SECRET_KEY = os.environ.get('BUDGET_BUDDY_SECRET_KEY')
 
-    SESSION_COOKIE_SECURE = True
-    REMEMBER_COOKIE_SECURE = True
+    
 
     # Configure gmail API
     MAIL_SERVER = 'smtp.googlemail.com'
@@ -17,7 +17,10 @@ class Config:
     MAIL_PASSWORD  = os.environ.get('BUDGET_BUDDY_GMAIL_PASS')
     MAIL_USE_TLS = True
 
-    # Configure session to use filesystem (instead of signed cookies)
+    # Configure session to use filesystem
     SESSION_FILE_DIR = mkdtemp()
     SESSION_PERMANENT = True
     SESSION_TYPE = "filesystem"
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=5)
