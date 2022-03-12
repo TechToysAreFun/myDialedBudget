@@ -8,7 +8,7 @@ class Config:
     SECRET_KEY = os.environ.get('BUDGET_BUDDY_SECRET_KEY')
 
     SESSION_COOKIE_SECURE = True
-    
+
     # Configure gmail API
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT  = 587
@@ -18,5 +18,5 @@ class Config:
 
     # Configure session to use filesystem (instead of signed cookies)
     SESSION_FILE_DIR = mkdtemp()
-    SESSION_PERMANENT = False
+    SESSION_PERMANENT = True
     SESSION_TYPE = "filesystem"
