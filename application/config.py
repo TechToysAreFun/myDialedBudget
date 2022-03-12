@@ -7,6 +7,8 @@ class Config:
 
     SECRET_KEY = os.environ.get('BUDGET_BUDDY_SECRET_KEY')
 
+    SESSION_COOKIE_SECURE = True
+    
     # Configure gmail API
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT  = 587
