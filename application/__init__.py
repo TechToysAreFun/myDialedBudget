@@ -12,15 +12,15 @@ db = SQL("sqlite:///application/mydialedbudget.db")
 # Create instance of 'mail' for this application
 mail = Mail()
 
-# Create instance of 'Session' for this application
-session = Session()
-
 # Set global variable that will hold the user's navbar avatar
 global nav_avatar
 nav_avatar = 'static/avatars/nav/default.png'
 
 
 def create_app(config_class=Config):
+    # Create instance of 'Session' for this application
+    session = Session()
+    
     # Create instance of the application
     app = Flask(__name__)
     # Set application to use configurations in config.py
