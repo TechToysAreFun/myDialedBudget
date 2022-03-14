@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}
+{{ ptitle }}
+{% endblock title %}
+
+{% block main %}
+
+<div class="row">
+    <!-- Crete blank 3-col sections on left and right of content -->
+    <div class="col-sm-3">
+    </div>
+
+    <div class="col-sm-4">
+        <br><br><br><br><br>
+        <h2>{{ id }}</h2>
+        <br>
+    </div>
+    <div class="col-sm-3"></div>
+</div>
+
+{% endblock main %}
