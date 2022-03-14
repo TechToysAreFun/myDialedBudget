@@ -16,13 +16,15 @@ mail = Mail()
 global nav_avatar
 nav_avatar = 'static/avatars/nav/default.png'
 
+# Create instance of 'Session' for this application
+session = Session()
+
 
 def create_app(config_class=Config):
-    # Create instance of 'Session' for this application
-    session = Session()
     
     # Create instance of the application
     app = Flask(__name__)
+
     # Set application to use configurations in config.py
     app.config.from_object(Config)
 

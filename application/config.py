@@ -21,6 +21,6 @@ class Config:
     SESSION_FILE_DIR = mkdtemp()
     SESSION_PERMANENT = True
     SESSION_TYPE = "filesystem"
-    SESSION_COOKIE_SECURE = True
-    REMEMBER_COOKIE_SECURE = True
+    #SESSION_COOKIE_SECURE = True
+    #REMEMBER_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = timedelta(hours=5)

@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request, session, url_for, Blueprint, current_app
+from flask import flash, redirect, render_template, request, session, url_for, Blueprint, g
 from application import nav_avatar
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
@@ -143,7 +143,9 @@ def login():
             name = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['first_name']
             flash(f'Hello, {name}!', 'primary')
 
-        return redirect(url_for('budget.index'))
+        return render_template('test.html', id=session['user_id'])
+
+        #return redirect(url_for('budget.index'))
 
     else:
         return render_template('login.html', session=session, ptitle='Login')

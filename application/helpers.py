@@ -1,11 +1,10 @@
 # The contents of this file are copied directly from Harvard's cs50x Finance source code
-from flask import redirect, session, current_app
+from flask import redirect, session
 from functools import wraps
 
 def login_required(f):
     """
     Decorate routes to require login.
-
     https://flask.palletsprojects.com/en/1.1.x/patterns/viewdecorators/
     """
     @wraps(f)

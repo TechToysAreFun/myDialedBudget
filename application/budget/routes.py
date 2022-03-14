@@ -4,6 +4,7 @@ from application import db, nav_avatar
 
 budget = Blueprint('budget', __name__)
 
+
 """ ---------- I N D E X ------------------------------------------------------------------------------------------ """
 @budget.route('/')
 @login_required
