@@ -143,9 +143,9 @@ def login():
             name = db.execute("SELECT * FROM users WHERE user_id = ?", session['user_id'])[0]['first_name']
             flash(f'Hello, {name}!', 'primary')
 
-        return render_template('test.html', id=session['user_id'])
+        #return render_template('test.html', id=session['user_id'])
 
-        #return redirect(url_for('budget.index'))
+        return redirect(url_for('budget.index'))
 
     else:
         return render_template('login.html', session=session, ptitle='Login')
