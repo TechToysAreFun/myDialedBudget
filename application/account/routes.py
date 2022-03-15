@@ -79,9 +79,6 @@ def register():
 @account.route('/login', methods=['GET', 'POST'])
 def login():
 
-    # Clear the existing user_id
-    session.clear()
-
     if request.method == "POST":
         # Extract inputs into variables
         username = request.form.get("username")
@@ -148,6 +145,9 @@ def login():
         return redirect(url_for('budget.index'))
 
     else:
+        # Clear the existing user_id
+        session.clear()
+
         return render_template('login.html', session=session, ptitle='Login')
 
 
