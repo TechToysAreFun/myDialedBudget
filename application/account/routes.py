@@ -83,6 +83,7 @@ def login():
         # Extract inputs into variables
         username = request.form.get("username")
         password = request.form.get("password")
+        next = request.form.get("next")
 
         # Set an indicator showing whether the user is logged in, telling the flashed messaged which format to show in
         logged = 0
@@ -142,7 +143,7 @@ def login():
 
         #return render_template('test.html', id=session['user_id'])
 
-        return redirect(url_for('budget.index'))
+        return redirect(url_for('budget.index', next=next))
 
     else:
         # Clear the existing user_id

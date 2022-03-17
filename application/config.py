@@ -19,10 +19,10 @@ class Config:
 
     # Configure session to use filesystem
     SESSION_FILE_DIR = mkdtemp()
-    SESSION_PERMANENT = True
+    SESSION_PERMANENT = False
     SESSION_TYPE = "filesystem"
     #SESSION_COOKIE_SECURE = True
     #REMEMBER_COOKIE_SECURE = True
-    PERMANENT_SESSION_LIFETIME = timedelta(hours=5)
-    SESSION_COOKIE_SAMESITE = "None"
-    SESSION_COOKIE_SECURE = True
+    #PERMANENT_SESSION_LIFETIME = timedelta(hours=5)
+    #SESSION_COOKIE_SAMESITE = "None"
+    #SESSION_COOKIE_SECURE = True

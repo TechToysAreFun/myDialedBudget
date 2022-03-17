@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import Flask, current_app
+from flask import Flask
 from flask_session import Session
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from application.helpers import usd
@@ -54,13 +54,13 @@ def create_app(config_class=Config):
     app.register_blueprint(transactions)
     app.register_blueprint(errors)
 
-    with app.app_context():
-        # Make sure responses from requests aren't cached
-        @app.after_request
-        def after_request(response):
-            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-            response.headers["Expires"] = 0
-            response.headers["Pragma"] = "no-cache"
-            return response
+    # with app.app_context():
+    #     # Make sure responses from requests aren't cached
+    #     @app.after_request
+    #     def after_request(response):
+    #         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    #         response.headers["Expires"] = 0
+    #         response.headers["Pragma"] = "no-cache"
+    #         return response
 
     return app
