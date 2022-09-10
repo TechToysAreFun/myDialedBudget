@@ -1,4 +1,4 @@
 /Pipfile
 /Pipfile.lock
 /application/config.py
-application/mydialedbudget.db
+# /application/mydialedbudget.db
