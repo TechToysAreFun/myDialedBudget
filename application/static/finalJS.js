@@ -21,6 +21,25 @@ function display_toggle(t1, t2, t3, t4, t5, t6) {
     }
 }
 
+function toggle_class(tclass) {
+    document.querySelectorAll(tclass).style.display = 'none';
+}
+
+
+function class_toggle(c1) {
+
+    vc1 = document.getElementsByClassName(c1)
+
+    for (let j = 0; j < vc1.length; j++) {
+        if (vc1[j].style.display === '') {
+            vc1[j].style.display = 'none';
+        }
+        else {
+            vc1[j].style.display = '';
+        }
+    }
+}
+
 // Set background color of 'avail' tds in budget table
 function avail_bg(goal, goal_met, goal_spent, avail, field_id, check_icon, fund_button) {
 

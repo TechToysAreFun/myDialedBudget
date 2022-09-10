@@ -120,7 +120,17 @@
                         {% else %}
                     <th colspan="5">
                         {% endif %}
+
+                        <!-- COLLAPSE GROUP BUTTON -->
+                        <button id="minimize_group_button_{{ group.group_id }}" class="btn"
+                            onclick="class_toggle('minmize_{{ group.group_id }}'), display_toggle(this.id, 'maxmize_group_button_{{ group.group_id }}')"><i
+                                class="fa fa-chevron-down"></i></button>
+                        <button id="maxmize_group_button_{{ group.group_id }}" class="btn" style="display: none"
+                            onclick="class_toggle('minmize_{{ group.group_id }}'), display_toggle(this.id, 'minimize_group_button_{{ group.group_id }}')"><i
+                                class="fa fa-chevron-up"></i></button>
                         {{ group.group_name }}
+
+
                         <button class="btn" id="group_edit_show_{{ group.group_name }}"
                             onclick="display_toggle(this.id, 'group_edit_hide_{{ group.group_name }}', 'group_edit_{{ group.group_id }}')"><i
                                 class='fas fa-edit' style="color: grey"></i></button>
@@ -193,14 +203,15 @@
                         </form>
                     </td>
                 </tr>
-
                 <!-- CREATE NEW ROW FOR EACH CATEGORY IN GROUP -->
                 {% for category in cats %}
 
                 {% if category.group_id == group.group_id %}
-                <tr>
+                <!-- CATEGORY LINE -->
+
+                <tr class="minmize_{{ group.group_id }}">
                     <td>
-                        <!-- CATEGORY LINE -->
+
                         <form action="{{ url_for('allocations.allocate')}}" method="POST">
 
                             <!-- FULLY FUND CATEGORY -->
@@ -250,6 +261,7 @@
                         <i id="check_field_{{ category.cat_id }}" style="display: none" class='far fa-check-circle'></i>
                     </td>
                 </tr>
+                </tr>
 
                 <!-- CATEGORY EDIT FORM THAT EXTENDS OPEN THE CATEGORY ROW WHEN CLICKED -->
                 <!-- Note that this form has two different actions based on the Submit and Deactivate buttons at the bottom -->
@@ -280,7 +292,6 @@
                         </form>
                     </td>
                 </tr>
-
                 {% endif %}
 
                 <!-- RUN JAVASCRIPT TO SET 'AVAIL' BACKGROUND COLOR -->
